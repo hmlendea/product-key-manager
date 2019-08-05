@@ -191,6 +191,38 @@ namespace ProductKeyManager.Service
             }
         }
 
+        ProductKey CreateProductKeyFromRequest(StoreProductKeyRequest request)
+        {
+            ProductKey productKey = new ProductKey();
+            productKey.Id = GenerateKeyId(request.Key);
+            productKey.StoreName = request.StoreName;
+            productKey.ProductName = request.ProductName;
+            productKey.Key = request.Key;
+            productKey.Status = ProductKeyStatus.FromName(request.Status);
+            productKey.AddedDateTime = DateTime.Now;
+            productKey.UpdatedDateTime = productKey.AddedDateTime;
+
+            return productKey;
+        }
+
+        ProductKey CreateProductKeyFromRequest(UpdateProductKeyRequest request)
+        {
+            ProductKey productKey = new ProductKey();
+            productKey.Id = GenerateKeyId(request.Key);
+            productKey.StoreName = request.StoreName;
+            productKey.ProductName = request.ProductName;
+            productKey.Key = request.Key;
+            productKey.Status = ProductKeyStatus.FromName(request.Status);
+
+            return productKey;
+        }
+
+        bool DoesKeyExistInStore(string key)
+        {
+            string id = GenerateKeyId(key);
+            return productKeyRepository.TryGet(id) != null;
+        }
+
         ProductKey FindProductKey(GetProductKeyRequest request)
         {
             IEnumerable<ProductKeyEntity> productKeyCandidates = productKeyRepository.GetAll();
@@ -207,42 +239,18 @@ namespace ProductKeyManager.Service
                     x => x.ProductName.Equals( request.ProductName, StringComparison.InvariantCultureIgnoreCase));
             }
 
+            if (!string.IsNullOrWhiteSpace(request.Status))
+            {
+                productKeyCandidates = productKeyCandidates.Where(
+                    x => x.Status.Equals(request.Status, StringComparison.InvariantCultureIgnoreCase));
+            }
+
             if (productKeyCandidates.Any())
             {
                 return productKeyCandidates.GetRandomElement().ToServiceModel();
             }
 
             return null;
-        }
-
-        ProductKey CreateProductKeyFromRequest(StoreProductKeyRequest request)
-        {
-            ProductKey productKey = new ProductKey();
-            productKey.Id = GenerateKeyId(request.Key);
-            productKey.StoreName = request.StoreName;
-            productKey.ProductName = request.ProductName;
-            productKey.Key = request.Key;
-            productKey.AddedDateTime = DateTime.Now;
-            productKey.UpdatedDateTime = productKey.AddedDateTime;
-
-            return productKey;
-        }
-
-        ProductKey CreateProductKeyFromRequest(UpdateProductKeyRequest request)
-        {
-            ProductKey productKey = new ProductKey();
-            productKey.Id = GenerateKeyId(request.Key);
-            productKey.StoreName = request.StoreName;
-            productKey.ProductName = request.ProductName;
-            productKey.Key = request.Key;
-
-            return productKey;
-        }
-
-        bool DoesKeyExistInStore(string key)
-        {
-            string id = GenerateKeyId(key);
-            return productKeyRepository.TryGet(id) != null;
         }
 
         void StoreProductKey(ProductKey productKey)
@@ -263,6 +271,11 @@ namespace ProductKeyManager.Service
             if (!string.IsNullOrWhiteSpace(productKey.ProductName))
             {
                 productKeyToUpdate.ProductName = productKey.ProductName;
+            }
+
+            if (productKey.Status != ProductKeyStatus.Unknown)
+            {
+                productKeyToUpdate.Status = productKey.Status;
             }
 
             productKeyToUpdate.UpdatedDateTime = DateTime.Now;

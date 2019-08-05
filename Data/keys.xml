@@ -5,7 +5,8 @@
     <StoreName>Test Store</StoreName>
     <ProductName>Test Product</ProductName>
     <Key>Test Key</Key>
+    <Status>Unknown</Status>
     <AddedDateTime>2019.08.05T15:41:33.0388+03:00</AddedDateTime>
-    <UpdatedDateTime>2019.08.05T16:25:23.1788+03:00</UpdatedDateTime>
+    <UpdatedDateTime>2019.08.05T16:40:39.7622+03:00</UpdatedDateTime>
   </ProductKeyEntity>
 </ArrayOfProductKeyEntity>

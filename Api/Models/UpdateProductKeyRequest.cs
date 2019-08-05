@@ -7,5 +7,7 @@ namespace ProductKeyManager.Api.Models
         public string ProductName { get; set; }
 
         public string Key { get; set; }
+
+        public string Status { get; set; }
     }
 }

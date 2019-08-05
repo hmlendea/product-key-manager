@@ -12,6 +12,8 @@ namespace ProductKeyManager.Service.Models
 
         public string Key { get; set; }
 
+        public ProductKeyStatus Status { get; set; }
+
         public DateTime AddedDateTime { get; set; }
 
         public DateTime UpdatedDateTime { get; set; }
