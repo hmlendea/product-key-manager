@@ -1,10 +1,16 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+using NuciDAL.Repositories;
 using NuciLog;
 using NuciLog.Core;
+using NuciSecurity.HMAC;
 
+using ProductKeyManager.Api.Models;
 using ProductKeyManager.Configuration;
+using ProductKeyManager.DataAccess.DataObjects;
+using ProductKeyManager.Security;
+using ProductKeyManager.Service;
 
 namespace ProductKeyManager
 {
@@ -30,6 +36,9 @@ namespace ProductKeyManager
         public static IServiceCollection AddCustomServices(this IServiceCollection services)
         {
             return services
+                .AddSingleton<IRepository<ProductKeyEntity>>(x => new XmlRepository<ProductKeyEntity>(dataStoreSettings.ProductKeysStorePath))
+                .AddSingleton<IHmacEncoder<GetProductKeyRequest>, GetProductKeyRequestHmacEncoder>()
+                .AddSingleton<IProductKeyService, ProductKeyService>()
                 .AddScoped<ILogger, NuciLogger>();
         }
     }

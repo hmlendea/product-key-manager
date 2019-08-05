@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfProductKeyEntity xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <ProductKeyEntity>
+        <Id>8dcab9fb-aa9a-4e06-9ae3-9e2343ebe93a</Id>
+        <StoreName>Test Store</StoreName>
+        <ProductName>Test Product</ProductName>
+        <Key>Test Key</Key>
+    </ProductKeyEntity>
+</ArrayOfProductKeyEntity>

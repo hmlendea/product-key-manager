@@ -92,7 +92,7 @@ namespace ProductKeyManager.Service
             if (!string.IsNullOrWhiteSpace(request.ProductName))
             {
                 productKeyCandidates = productKeyCandidates.Where(
-                    x => x.StoreName.Equals( request.ProductName, StringComparison.InvariantCultureIgnoreCase));
+                    x => x.ProductName.Equals( request.ProductName, StringComparison.InvariantCultureIgnoreCase));
             }
 
             if (productKeyCandidates.Any())
