@@ -11,5 +11,7 @@ namespace ProductKeyManager.Logging
         }
         
         public static Operation GetProductKey => new MyOperation(nameof(GetProductKey));
+        
+        public static Operation StoreProductKey => new MyOperation(nameof(StoreProductKey));
     }
 }

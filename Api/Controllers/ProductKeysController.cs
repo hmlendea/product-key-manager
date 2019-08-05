@@ -20,7 +20,7 @@ namespace ProductKeyManager.Controllers
         }
 
         [HttpGet]
-        public ActionResult GetRandom(
+        public ActionResult GetProductKey(
             [FromQuery] string storeName,
             [FromQuery] string productName,
             [FromQuery] string hmac)
@@ -37,6 +37,34 @@ namespace ProductKeyManager.Controllers
                 ProductKey key = service.GetProductKey(request);
 
                 return Ok(key);
+            }
+            catch (Exception ex)
+            {
+                ErrorResponse response = new ErrorResponse(ex);
+                return BadRequest(response);
+            }
+        }
+
+        [HttpPost]
+        public ActionResult AddProductKey(
+            [FromQuery] string storeName,
+            [FromQuery] string productName,
+            [FromQuery] string key,
+            [FromQuery] string hmac)
+        {
+            try
+            {
+                StoreProductKeyRequest request = new StoreProductKeyRequest
+                {
+                    StoreName = storeName,
+                    ProductName = productName,
+                    Key = key,
+                    HmacToken = hmac
+                };
+
+                service.StoreProductKey(request);
+
+                return Ok();
             }
             catch (Exception ex)
             {

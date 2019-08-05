@@ -5,6 +5,8 @@ namespace ProductKeyManager.Service
 {
     public interface IProductKeyService
     {
+        void StoreProductKey(StoreProductKeyRequest request);
+
         ProductKey GetProductKey(GetProductKeyRequest request);
     }
 }

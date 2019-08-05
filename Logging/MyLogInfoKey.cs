@@ -13,5 +13,7 @@ namespace ProductKeyManager.Logging
         public static LogInfoKey StoreName => new MyLogInfoKey(nameof(StoreName));
 
         public static LogInfoKey ProductName => new MyLogInfoKey(nameof(ProductName));
+
+        public static LogInfoKey Key => new MyLogInfoKey(nameof(Key));
     }
 }
