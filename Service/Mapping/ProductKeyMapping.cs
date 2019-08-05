@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
+using ProductKeyManager.Api.Models;
 using ProductKeyManager.DataAccess.DataObjects;
 using ProductKeyManager.Service.Models;
 
@@ -40,6 +41,17 @@ namespace ProductKeyManager.Service.Mapping
             return dataObject;
         }
 
+        internal static ProductKeyObject ToApiObject(this ProductKey serviceModel)
+        {
+            ProductKeyObject apiObject = new ProductKeyObject();
+            apiObject.Store = serviceModel.StoreName;
+            apiObject.Product = serviceModel.ProductName;
+            apiObject.Key = serviceModel.Key;
+            apiObject.Status = serviceModel.Status.Name;
+
+            return apiObject;
+        }
+
         internal static IEnumerable<ProductKey> ToServiceModels(this IEnumerable<ProductKeyEntity> dataObjects)
         {
             IEnumerable<ProductKey> serviceModels = dataObjects.Select(dataObject => dataObject.ToServiceModel());
@@ -52,6 +64,13 @@ namespace ProductKeyManager.Service.Mapping
             IEnumerable<ProductKeyEntity> dataObjects = serviceModels.Select(serviceModel => serviceModel.ToDataObject());
 
             return dataObjects;
+        }
+
+        internal static IEnumerable<ProductKeyObject> ToApiObjects(this IEnumerable<ProductKey> serviceModels)
+        {
+            IEnumerable<ProductKeyObject> apiObjects = serviceModels.Select(serviceModel => serviceModel.ToApiObject());
+
+            return apiObjects;
         }
     }
 }

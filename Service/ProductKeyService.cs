@@ -25,6 +25,7 @@ namespace ProductKeyManager.Service
         readonly IHmacEncoder<GetProductKeyRequest> getRequestEncoder;
         readonly IHmacEncoder<StoreProductKeyRequest> storeRequestEncoder;
         readonly IHmacEncoder<UpdateProductKeyRequest> updateRequestEncoder;
+        readonly IHmacEncoder<ProductKeyResponse> productKeyResponseEncoder;
         readonly SecuritySettings securitySettings;
         readonly ILogger logger;
 
@@ -33,6 +34,7 @@ namespace ProductKeyManager.Service
             IHmacEncoder<GetProductKeyRequest> getRequestEncoder,
             IHmacEncoder<StoreProductKeyRequest> storeRequestEncoder,
             IHmacEncoder<UpdateProductKeyRequest> updateRequestEncoder,
+            IHmacEncoder<ProductKeyResponse> productKeyResponseEncoder,
             SecuritySettings securitySettings,
             ILogger logger)
         {
@@ -40,11 +42,12 @@ namespace ProductKeyManager.Service
             this.getRequestEncoder = getRequestEncoder;
             this.storeRequestEncoder = storeRequestEncoder;
             this.updateRequestEncoder = updateRequestEncoder;
+            this.productKeyResponseEncoder = productKeyResponseEncoder;
             this.securitySettings = securitySettings;
             this.logger = logger;
         }
 
-        public ProductKey GetProductKey(GetProductKeyRequest request)
+        public ProductKeyResponse GetProductKey(GetProductKeyRequest request)
         {
             IEnumerable<LogInfo> logInfos = new List<LogInfo>
             {
@@ -60,12 +63,18 @@ namespace ProductKeyManager.Service
 
             if (productKey is null)
             {
-                logger.Info(MyOperation.GetProductKey, OperationStatus.Failure, logInfos);
-                return null;
+                Exception ex = new NullReferenceException("No key found for the given filters");
+                logger.Info(MyOperation.GetProductKey, OperationStatus.Failure, ex, logInfos);
+
+                throw ex;
             }
-            
+
+            ProductKeyResponse response = new ProductKeyResponse(productKey.ToApiObject());
+            response.HmacToken = productKeyResponseEncoder.GenerateToken(response, securitySettings.SharedSecretKey);
+
             logger.Info(MyOperation.GetProductKey, OperationStatus.Success, logInfos);
-            return productKey;
+
+            return response;
         }
 
         public void StoreProductKey(StoreProductKeyRequest request)

@@ -36,9 +36,8 @@ namespace ProductKeyManager.Controllers
                     HmacToken = hmac
                 };
 
-                ProductKey key = service.GetProductKey(request);
-
-                return Ok(key);
+                ProductKeyResponse response = service.GetProductKey(request);
+                return Ok(response);
             }
             catch (Exception ex)
             {

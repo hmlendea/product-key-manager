@@ -1,5 +1,4 @@
 using ProductKeyManager.Api.Models;
-using ProductKeyManager.Service.Models;
 
 namespace ProductKeyManager.Service
 {
@@ -7,7 +6,7 @@ namespace ProductKeyManager.Service
     {
         void StoreProductKey(StoreProductKeyRequest request);
 
-        ProductKey GetProductKey(GetProductKeyRequest request);
+        ProductKeyResponse GetProductKey(GetProductKeyRequest request);
 
         void UpdateProductKey(UpdateProductKeyRequest request);
     }

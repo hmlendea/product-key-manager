@@ -40,6 +40,7 @@ namespace ProductKeyManager
                 .AddSingleton<IHmacEncoder<GetProductKeyRequest>, GetProductKeyRequestHmacEncoder>()
                 .AddSingleton<IHmacEncoder<StoreProductKeyRequest>, StoreProductKeyRequestHmacEncoder>()
                 .AddSingleton<IHmacEncoder<UpdateProductKeyRequest>, UpdateProductKeyRequestHmacEncoder>()
+                .AddSingleton<IHmacEncoder<ProductKeyResponse>, ProductKeyResponseHmacEncoder>()
                 .AddSingleton<IProductKeyService, ProductKeyService>()
                 .AddScoped<ILogger, NuciLogger>();
         }
