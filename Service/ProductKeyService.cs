@@ -24,6 +24,7 @@ namespace ProductKeyManager.Service
         readonly IRepository<ProductKeyEntity> productKeyRepository;
         readonly IHmacEncoder<GetProductKeyRequest> getRequestEncoder;
         readonly IHmacEncoder<StoreProductKeyRequest> storeRequestEncoder;
+        readonly IHmacEncoder<UpdateProductKeyRequest> updateRequestEncoder;
         readonly SecuritySettings securitySettings;
         readonly ILogger logger;
 
@@ -31,12 +32,14 @@ namespace ProductKeyManager.Service
             IRepository<ProductKeyEntity> productKeyRepository,
             IHmacEncoder<GetProductKeyRequest> getRequestEncoder,
             IHmacEncoder<StoreProductKeyRequest> storeRequestEncoder,
+            IHmacEncoder<UpdateProductKeyRequest> updateRequestEncoder,
             SecuritySettings securitySettings,
             ILogger logger)
         {
             this.productKeyRepository = productKeyRepository;
             this.getRequestEncoder = getRequestEncoder;
             this.storeRequestEncoder = storeRequestEncoder;
+            this.updateRequestEncoder = updateRequestEncoder;
             this.securitySettings = securitySettings;
             this.logger = logger;
         }
@@ -77,10 +80,30 @@ namespace ProductKeyManager.Service
             logger.Info(MyOperation.StoreProductKey, OperationStatus.Started, logInfos);
 
             ValidateStoreRequest(request);
-            ProductKey productKey = CreateProductKeyFromRequest(request);
 
+            ProductKey productKey = CreateProductKeyFromRequest(request);
             StoreProductKey(productKey);
+
             logger.Debug(MyOperation.StoreProductKey, OperationStatus.Success, logInfos);
+        }
+
+        public void UpdateProductKey(UpdateProductKeyRequest request)
+        {
+            IEnumerable<LogInfo> logInfos = new List<LogInfo>
+            {
+                new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
+                new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
+                new LogInfo(MyLogInfoKey.Key, request.Key)
+            };
+
+            logger.Info(MyOperation.UpdateProductKey, OperationStatus.Started, logInfos);
+
+            ValidateUpdateRequest(request);
+            
+            ProductKey productKey = CreateProductKeyFromRequest(request);
+            UpdateProductKeyDetails(productKey);
+
+            logger.Debug(MyOperation.UpdateProductKey, OperationStatus.Success, logInfos);
         }
         
         void ValidateGetRequest(GetProductKeyRequest request)
@@ -116,7 +139,7 @@ namespace ProductKeyManager.Service
             {
                 exception = new ArgumentNullException("key");
             }
-            else if (DoesKeyAlreadyExist(request.Key))
+            else if (DoesKeyExistInStore(request.Key))
             {
                 exception = new ArgumentException("The specified product key already exists");
             }
@@ -124,7 +147,40 @@ namespace ProductKeyManager.Service
             if (!(exception is null))
             {
                 logger.Error(
-                    MyOperation.GetProductKey,
+                    MyOperation.StoreProductKey,
+                    OperationStatus.Failure,
+                    exception,
+                    new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
+                    new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
+                    new LogInfo(MyLogInfoKey.Key, request.Key));
+
+                throw exception;
+            }
+        }
+        
+        void ValidateUpdateRequest(UpdateProductKeyRequest request)
+        {
+            bool isTokenValid = updateRequestEncoder.IsTokenValid(request.HmacToken, request, securitySettings.SharedSecretKey);
+
+            Exception exception = null;
+
+            if (!isTokenValid && securitySettings.IsEnabled)
+            {
+                exception = new AuthenticationException("The provided HMAC token is not valid");
+            }
+            else if (string.IsNullOrWhiteSpace(request.Key))
+            {
+                exception = new ArgumentNullException("key");
+            }
+            else if (!DoesKeyExistInStore(request.Key))
+            {
+                exception = new ArgumentException("The specified product key does not exist");
+            }
+
+            if (!(exception is null))
+            {
+                logger.Error(
+                    MyOperation.UpdateProductKey,
                     OperationStatus.Failure,
                     exception,
                     new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
@@ -172,7 +228,18 @@ namespace ProductKeyManager.Service
             return productKey;
         }
 
-        bool DoesKeyAlreadyExist(string key)
+        ProductKey CreateProductKeyFromRequest(UpdateProductKeyRequest request)
+        {
+            ProductKey productKey = new ProductKey();
+            productKey.Id = GenerateKeyId(request.Key);
+            productKey.StoreName = request.StoreName;
+            productKey.ProductName = request.ProductName;
+            productKey.Key = request.Key;
+
+            return productKey;
+        }
+
+        bool DoesKeyExistInStore(string key)
         {
             string id = GenerateKeyId(key);
             return productKeyRepository.TryGet(id) != null;
@@ -181,6 +248,26 @@ namespace ProductKeyManager.Service
         void StoreProductKey(ProductKey productKey)
         {
             productKeyRepository.Add(productKey.ToDataObject());
+            productKeyRepository.ApplyChanges();
+        }
+
+        void UpdateProductKeyDetails(ProductKey productKey)
+        {
+            ProductKey productKeyToUpdate = productKeyRepository.Get(productKey.Id).ToServiceModel();
+
+            if (!string.IsNullOrWhiteSpace(productKey.StoreName))
+            {
+                productKeyToUpdate.StoreName = productKey.StoreName;
+            }
+            
+            if (!string.IsNullOrWhiteSpace(productKey.ProductName))
+            {
+                productKeyToUpdate.ProductName = productKey.ProductName;
+            }
+
+            productKeyToUpdate.UpdatedDateTime = DateTime.Now;
+
+            productKeyRepository.Update(productKeyToUpdate.ToDataObject());
             productKeyRepository.ApplyChanges();
         }
 

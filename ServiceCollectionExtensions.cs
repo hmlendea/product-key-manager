@@ -39,6 +39,7 @@ namespace ProductKeyManager
                 .AddSingleton<IRepository<ProductKeyEntity>>(x => new XmlRepository<ProductKeyEntity>(dataStoreSettings.ProductKeysStorePath))
                 .AddSingleton<IHmacEncoder<GetProductKeyRequest>, GetProductKeyRequestHmacEncoder>()
                 .AddSingleton<IHmacEncoder<StoreProductKeyRequest>, StoreProductKeyRequestHmacEncoder>()
+                .AddSingleton<IHmacEncoder<UpdateProductKeyRequest>, UpdateProductKeyRequestHmacEncoder>()
                 .AddSingleton<IProductKeyService, ProductKeyService>()
                 .AddScoped<ILogger, NuciLogger>();
         }

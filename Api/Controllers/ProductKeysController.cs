@@ -72,5 +72,33 @@ namespace ProductKeyManager.Controllers
                 return BadRequest(response);
             }
         }
+
+        [HttpPut]
+        public ActionResult UpdateProductKey(
+            [FromQuery] string storeName,
+            [FromQuery] string productName,
+            [FromQuery] string key,
+            [FromQuery] string hmac)
+        {
+            try
+            {
+                UpdateProductKeyRequest request = new UpdateProductKeyRequest
+                {
+                    StoreName = storeName,
+                    ProductName = productName,
+                    Key = key,
+                    HmacToken = hmac
+                };
+
+                service.UpdateProductKey(request);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                ErrorResponse response = new ErrorResponse(ex);
+                return BadRequest(response);
+            }
+        }
     }
 }

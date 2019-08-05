@@ -8,5 +8,7 @@ namespace ProductKeyManager.Service
         void StoreProductKey(StoreProductKeyRequest request);
 
         ProductKey GetProductKey(GetProductKeyRequest request);
+
+        void UpdateProductKey(UpdateProductKeyRequest request);
     }
 }

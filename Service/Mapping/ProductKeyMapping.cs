@@ -10,7 +10,7 @@ namespace ProductKeyManager.Service.Mapping
 {
     static class ProductKeyMappings
     {
-        const string DateTimeFormat = "yyyy/MM/ddTHH:mm:ss.ffffzzz";
+        const string DateTimeFormat = "yyyy.MM.ddTHH:mm:ss.ffffzzz";
         
         internal static ProductKey ToServiceModel(this ProductKeyEntity dataObject)
         {
