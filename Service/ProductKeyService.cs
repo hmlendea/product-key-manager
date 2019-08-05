@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Authentication;
+using System.Security.Cryptography;
+using System.Text;
 
 using NuciDAL.Repositories;
 using NuciExtensions;
@@ -160,7 +162,7 @@ namespace ProductKeyManager.Service
         ProductKey CreateProductKeyFromRequest(StoreProductKeyRequest request)
         {
             ProductKey productKey = new ProductKey();
-            productKey.Id = Guid.NewGuid().ToString();
+            productKey.Id = GenerateKeyId(request.Key);
             productKey.StoreName = request.StoreName;
             productKey.ProductName = request.ProductName;
             productKey.Key = request.Key;
@@ -172,20 +174,25 @@ namespace ProductKeyManager.Service
 
         bool DoesKeyAlreadyExist(string key)
         {
-            IEnumerable<ProductKeyEntity> productKeys = productKeyRepository.GetAll();
-
-            if (productKeys.Any(x => x.Key.Equals(key, StringComparison.InvariantCultureIgnoreCase)))
-            {
-                return true;
-            }
-
-            return false;
+            string id = GenerateKeyId(key);
+            return productKeyRepository.TryGet(id) != null;
         }
 
         void StoreProductKey(ProductKey productKey)
         {
             productKeyRepository.Add(productKey.ToDataObject());
             productKeyRepository.ApplyChanges();
+        }
+
+        string GenerateKeyId(string key)
+        {
+            using (MD5 md5 = MD5.Create())
+            {
+                byte[] hash = md5.ComputeHash(Encoding.Default.GetBytes(key));
+                Guid result = new Guid(hash);
+
+                return result.ToString();
+            }
         }
     }
 }
