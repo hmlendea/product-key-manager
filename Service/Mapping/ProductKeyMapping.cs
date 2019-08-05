@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 using ProductKeyManager.DataAccess.DataObjects;
@@ -8,6 +10,8 @@ namespace ProductKeyManager.Service.Mapping
 {
     static class ProductKeyMappings
     {
+        const string DateTimeFormat = "yyyy/MM/ddTHH:mm:ss.ffffzzz";
+        
         internal static ProductKey ToServiceModel(this ProductKeyEntity dataObject)
         {
             ProductKey serviceModel = new ProductKey();
@@ -15,6 +19,8 @@ namespace ProductKeyManager.Service.Mapping
             serviceModel.StoreName = dataObject.StoreName;
             serviceModel.ProductName = dataObject.ProductName;
             serviceModel.Key = dataObject.Key;
+            serviceModel.AddedDateTime = DateTime.ParseExact(dataObject.AddedDateTime, DateTimeFormat, CultureInfo.InvariantCulture);
+            serviceModel.UpdatedDateTime = DateTime.ParseExact(dataObject.UpdatedDateTime, DateTimeFormat, CultureInfo.InvariantCulture);
 
             return serviceModel;
         }
@@ -26,6 +32,8 @@ namespace ProductKeyManager.Service.Mapping
             dataObject.StoreName = serviceModel.StoreName;
             dataObject.ProductName = serviceModel.ProductName;
             dataObject.Key = serviceModel.Key;
+            dataObject.AddedDateTime = serviceModel.AddedDateTime.ToString(DateTimeFormat);
+            dataObject.UpdatedDateTime = serviceModel.UpdatedDateTime.ToString(DateTimeFormat);
 
             return dataObject;
         }

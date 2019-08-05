@@ -9,5 +9,9 @@ namespace ProductKeyManager.DataAccess.DataObjects
         public string ProductName { get; set; }
 
         public string Key { get; set; }
+
+        public string AddedDateTime { get; set; }
+
+        public string UpdatedDateTime { get; set; }
     }
 }

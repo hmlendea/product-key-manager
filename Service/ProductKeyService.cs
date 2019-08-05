@@ -164,6 +164,8 @@ namespace ProductKeyManager.Service
             productKey.StoreName = request.StoreName;
             productKey.ProductName = request.ProductName;
             productKey.Key = request.Key;
+            productKey.AddedDateTime = DateTime.Now;
+            productKey.UpdatedDateTime = productKey.AddedDateTime;
 
             return productKey;
         }
