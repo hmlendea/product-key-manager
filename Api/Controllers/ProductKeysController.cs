@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 using ProductKeyManager.Api.Models;
 using ProductKeyManager.Service;
-using ProductKeyManager.Service.Models;
 
 namespace ProductKeyManager.Controllers
 {
@@ -47,9 +46,9 @@ namespace ProductKeyManager.Controllers
         }
 
         [HttpPost]
-        public ActionResult AddProductKey(
-            [FromQuery] string storeName,
-            [FromQuery] string productName,
+        public ActionResult StoreProductKey(
+            [FromQuery] string store,
+            [FromQuery] string product,
             [FromQuery] string key,
             [FromQuery] string status,
             [FromQuery] string hmac)
@@ -58,8 +57,8 @@ namespace ProductKeyManager.Controllers
             {
                 StoreProductKeyRequest request = new StoreProductKeyRequest
                 {
-                    StoreName = storeName,
-                    ProductName = productName,
+                    StoreName = store,
+                    ProductName = product,
                     Key = key,
                     Status = status,
                     HmacToken = hmac
