@@ -17,22 +17,16 @@ namespace ProductKeyManager.Service.Models
 
         public string Name { get; }
 
-        public bool IsValid { get; }
-
-        public bool IsUsable { get; }
-
-        ProductKeyStatus(string name, bool isValid, bool isUsable)
+        ProductKeyStatus(string name)
         {
             Name = name;
-            IsValid = isValid;
-            IsUsable = isUsable;
         }
 
-        public static ProductKeyStatus Unknown => new ProductKeyStatus(nameof(Unknown), true, true);
-        public static ProductKeyStatus Used => new ProductKeyStatus(nameof(Used), true, false);
-        public static ProductKeyStatus Vacant => new ProductKeyStatus(nameof(Vacant), true, true);
-        public static ProductKeyStatus Invalid => new ProductKeyStatus(nameof(Invalid), false, false);
-        public static ProductKeyStatus AlreadyOwned => new ProductKeyStatus(nameof(AlreadyOwned), false, true);
+        public static ProductKeyStatus Unknown => new ProductKeyStatus(nameof(Unknown));
+        public static ProductKeyStatus Used => new ProductKeyStatus(nameof(Used));
+        public static ProductKeyStatus Vacant => new ProductKeyStatus(nameof(Vacant));
+        public static ProductKeyStatus Invalid => new ProductKeyStatus(nameof(Invalid));
+        public static ProductKeyStatus AlreadyOwned => new ProductKeyStatus(nameof(AlreadyOwned));
 
         public static IEnumerable<ProductKeyStatus> Values
             => entries.Values;
@@ -103,9 +97,7 @@ namespace ProductKeyManager.Service.Models
         {
             unchecked
             {
-                return ((Name != null ? Name.GetHashCode() : 0) * 397) ^
-                        IsValid.GetHashCode() ^
-                        IsUsable.GetHashCode();
+                return (Name != null ? Name.GetHashCode() : 0) * 397;
             }
         }
     }
