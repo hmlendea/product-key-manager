@@ -11,7 +11,8 @@ namespace ProductKeyManager.Service.Models
             { Unknown.Name, Unknown },
             { Used.Name, Used },
             { Vacant.Name, Vacant },
-            { Invalid.Name, Invalid }
+            { Invalid.Name, Invalid },
+            { AlreadyOwned.Name, AlreadyOwned }
         };
 
         public string Name { get; }
@@ -31,6 +32,7 @@ namespace ProductKeyManager.Service.Models
         public static ProductKeyStatus Used => new ProductKeyStatus(nameof(Used), true, false);
         public static ProductKeyStatus Vacant => new ProductKeyStatus(nameof(Vacant), true, true);
         public static ProductKeyStatus Invalid => new ProductKeyStatus(nameof(Invalid), false, false);
+        public static ProductKeyStatus AlreadyOwned => new ProductKeyStatus(nameof(AlreadyOwned), false, true);
 
         public static IEnumerable<ProductKeyStatus> Values
             => entries.Values;
