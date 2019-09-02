@@ -10,6 +10,8 @@ namespace ProductKeyManager.DataAccess.DataObjects
 
         public string Key { get; set; }
 
+        public string Owner { get; set; }
+
         public string Status { get; set; }
 
         public string AddedDateTime { get; set; }
