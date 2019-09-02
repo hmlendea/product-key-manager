@@ -20,8 +20,8 @@ namespace ProductKeyManager.Controllers
 
         [HttpGet]
         public ActionResult GetProductKey(
-            [FromQuery] string storeName,
-            [FromQuery] string productName,
+            [FromQuery] string store,
+            [FromQuery] string product,
             [FromQuery] string status,
             [FromQuery] string hmac)
         {
@@ -29,8 +29,8 @@ namespace ProductKeyManager.Controllers
             {
                 GetProductKeyRequest request = new GetProductKeyRequest
                 {
-                    StoreName = storeName,
-                    ProductName = productName,
+                    StoreName = store,
+                    ProductName = product,
                     Status = status,
                     HmacToken = hmac
                 };
@@ -77,8 +77,8 @@ namespace ProductKeyManager.Controllers
 
         [HttpPut]
         public ActionResult UpdateProductKey(
-            [FromQuery] string storeName,
-            [FromQuery] string productName,
+            [FromQuery] string store,
+            [FromQuery] string product,
             [FromQuery] string key,
             [FromQuery] string status,
             [FromQuery] string hmac)
@@ -87,8 +87,8 @@ namespace ProductKeyManager.Controllers
             {
                 UpdateProductKeyRequest request = new UpdateProductKeyRequest
                 {
-                    StoreName = storeName,
-                    ProductName = productName,
+                    StoreName = store,
+                    ProductName = product,
                     Key = key,
                     Status = status,
                     HmacToken = hmac
