@@ -22,6 +22,7 @@ namespace ProductKeyManager.Controllers
         public ActionResult GetProductKey(
             [FromQuery] string store,
             [FromQuery] string product,
+            [FromQuery] string owner,
             [FromQuery] string status,
             [FromQuery] string hmac)
         {
@@ -31,6 +32,7 @@ namespace ProductKeyManager.Controllers
                 {
                     StoreName = store,
                     ProductName = product,
+                    Owner = owner,
                     Status = status,
                     HmacToken = hmac
                 };
@@ -50,6 +52,7 @@ namespace ProductKeyManager.Controllers
             [FromQuery] string store,
             [FromQuery] string product,
             [FromQuery] string key,
+            [FromQuery] string owner,
             [FromQuery] string status,
             [FromQuery] string hmac)
         {
@@ -60,6 +63,7 @@ namespace ProductKeyManager.Controllers
                     StoreName = store,
                     ProductName = product,
                     Key = key,
+                    Owner = owner,
                     Status = status,
                     HmacToken = hmac
                 };
@@ -80,6 +84,7 @@ namespace ProductKeyManager.Controllers
             [FromQuery] string store,
             [FromQuery] string product,
             [FromQuery] string key,
+            [FromQuery] string owner,
             [FromQuery] string status,
             [FromQuery] string hmac)
         {
@@ -90,6 +95,7 @@ namespace ProductKeyManager.Controllers
                     StoreName = store,
                     ProductName = product,
                     Key = key,
+                    Owner = owner,
                     Status = status,
                     HmacToken = hmac
                 };

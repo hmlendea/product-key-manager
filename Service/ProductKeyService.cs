@@ -207,6 +207,7 @@ namespace ProductKeyManager.Service
             productKey.StoreName = request.StoreName;
             productKey.ProductName = request.ProductName;
             productKey.Key = request.Key;
+            productKey.Owner = request.Owner;
             productKey.Status = ProductKeyStatus.FromName(request.Status);
             productKey.AddedDateTime = DateTime.Now;
             productKey.UpdatedDateTime = productKey.AddedDateTime;
@@ -221,6 +222,7 @@ namespace ProductKeyManager.Service
             productKey.StoreName = request.StoreName;
             productKey.ProductName = request.ProductName;
             productKey.Key = request.Key;
+            productKey.Owner = request.Owner;
             productKey.Status = ProductKeyStatus.FromName(request.Status);
 
             return productKey;
@@ -246,6 +248,12 @@ namespace ProductKeyManager.Service
             {
                 productKeyCandidates = productKeyCandidates.Where(
                     x => x.ProductName.Equals( request.ProductName, StringComparison.InvariantCultureIgnoreCase));
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.Owner))
+            {
+                productKeyCandidates = productKeyCandidates.Where(
+                    x => x.Status.Equals(request.Owner, StringComparison.InvariantCultureIgnoreCase));
             }
 
             if (!string.IsNullOrWhiteSpace(request.Status))
@@ -280,6 +288,11 @@ namespace ProductKeyManager.Service
             if (!string.IsNullOrWhiteSpace(productKey.ProductName))
             {
                 productKeyToUpdate.ProductName = productKey.ProductName;
+            }
+            
+            if (!string.IsNullOrWhiteSpace(productKey.Owner))
+            {
+                productKeyToUpdate.Owner = productKey.Owner;
             }
 
             if (productKey.Status != ProductKeyStatus.Unknown)
