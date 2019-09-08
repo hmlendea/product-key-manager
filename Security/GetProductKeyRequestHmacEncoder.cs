@@ -10,7 +10,8 @@ namespace ProductKeyManager.Security
         {
             string stringForSigning =
                 obj.StoreName +
-                obj.ProductName;
+                obj.ProductName +
+                obj.Owner;
 
             string hmacToken = ComputeHmacToken(stringForSigning, sharedSecretKey);
 
