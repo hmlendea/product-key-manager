@@ -21,6 +21,7 @@ namespace ProductKeyManager.Security
                     productKey.Store +
                     productKey.Product +
                     productKey.Key +
+                    productKey.Owner +
                     productKey.Status;
             }
 
