@@ -12,7 +12,8 @@ namespace ProductKeyManager.Service.Models
             { Used.Name, Used },
             { Vacant.Name, Vacant },
             { Invalid.Name, Invalid },
-            { AlreadyOwned.Name, AlreadyOwned }
+            { AlreadyOwned.Name, AlreadyOwned },
+            { RequiresBaseProduct.Name, RequiresBaseProduct }
         };
 
         public string Name { get; }
@@ -27,6 +28,7 @@ namespace ProductKeyManager.Service.Models
         public static ProductKeyStatus Vacant => new ProductKeyStatus(nameof(Vacant));
         public static ProductKeyStatus Invalid => new ProductKeyStatus(nameof(Invalid));
         public static ProductKeyStatus AlreadyOwned => new ProductKeyStatus(nameof(AlreadyOwned));
+        public static ProductKeyStatus RequiresBaseProduct => new ProductKeyStatus(nameof(RequiresBaseProduct));
 
         public static IEnumerable<ProductKeyStatus> Values
             => entries.Values;
