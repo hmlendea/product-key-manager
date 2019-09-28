@@ -24,6 +24,7 @@ namespace ProductKeyManager.Controllers
             [FromQuery] string product,
             [FromQuery] string owner,
             [FromQuery] string status,
+            [FromQuery] string count,
             [FromQuery] string hmac)
         {
             try
@@ -36,6 +37,17 @@ namespace ProductKeyManager.Controllers
                     Status = status,
                     HmacToken = hmac
                 };
+
+                if (string.IsNullOrWhiteSpace(count))
+                {
+                    request.Count = 1;
+                }
+                else
+                {
+                    int parsedCount = 1;
+                    int.TryParse(count, out parsedCount);
+                    request.Count = Math.Max(1, parsedCount);
+                }
 
                 ProductKeyResponse response = service.GetProductKey(request);
                 return Ok(response);
