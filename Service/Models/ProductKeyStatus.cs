@@ -13,7 +13,8 @@ namespace ProductKeyManager.Service.Models
             { Vacant.Name, Vacant },
             { Invalid.Name, Invalid },
             { AlreadyOwned.Name, AlreadyOwned },
-            { RequiresBaseProduct.Name, RequiresBaseProduct }
+            { RequiresBaseProduct.Name, RequiresBaseProduct },
+            { RegionLocked.Name, RegionLocked }
         };
 
         public string Name { get; }
@@ -29,6 +30,7 @@ namespace ProductKeyManager.Service.Models
         public static ProductKeyStatus Invalid => new ProductKeyStatus(nameof(Invalid));
         public static ProductKeyStatus AlreadyOwned => new ProductKeyStatus(nameof(AlreadyOwned));
         public static ProductKeyStatus RequiresBaseProduct => new ProductKeyStatus(nameof(RequiresBaseProduct));
+        public static ProductKeyStatus RegionLocked => new ProductKeyStatus(nameof(RegionLocked));
 
         public static IEnumerable<ProductKeyStatus> Values
             => entries.Values;
