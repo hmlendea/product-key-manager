@@ -59,9 +59,9 @@ namespace ProductKeyManager.Service
 
             ValidateGetRequest(request);
 
-            ProductKey productKey = FindProductKey(request);
+            IEnumerable<ProductKey> productKeys = FindProductKeys(request, request.Count);
 
-            if (productKey is null)
+            if (productKeys?.Count() == 0)
             {
                 Exception ex = new NullReferenceException("No key found for the given filters");
                 logger.Info(MyOperation.GetProductKey, OperationStatus.Failure, ex, logInfos);
@@ -69,7 +69,7 @@ namespace ProductKeyManager.Service
                 throw ex;
             }
 
-            ProductKeyResponse response = new ProductKeyResponse(productKey.ToApiObject());
+            ProductKeyResponse response = new ProductKeyResponse(productKeys.ToApiObjects());
             response.HmacToken = productKeyResponseEncoder.GenerateToken(response, securitySettings.SharedSecretKey);
 
             logger.Info(MyOperation.GetProductKey, OperationStatus.Success, logInfos);
@@ -234,7 +234,7 @@ namespace ProductKeyManager.Service
             return productKeyRepository.TryGet(id) != null;
         }
 
-        ProductKey FindProductKey(GetProductKeyRequest request)
+        IEnumerable<ProductKey> FindProductKeys(GetProductKeyRequest request, int count)
         {
             IEnumerable<ProductKeyEntity> productKeyCandidates = productKeyRepository.GetAll();
 
@@ -262,12 +262,14 @@ namespace ProductKeyManager.Service
                     x => x.Status.Equals(request.Status, StringComparison.InvariantCultureIgnoreCase));
             }
 
-            if (productKeyCandidates.Any())
+            IList<ProductKeyEntity> shuffledCandidates = ListExtensions.Shuffle(productKeyCandidates.ToList()).Distinct().ToList();
+            
+            if (count > shuffledCandidates.Count)
             {
-                return productKeyCandidates.GetRandomElement().ToServiceModel();
+                count = shuffledCandidates.Count;
             }
 
-            return null;
+            return shuffledCandidates.ToServiceModels().Take(count);
         }
 
         void StoreProductKey(ProductKey productKey)
