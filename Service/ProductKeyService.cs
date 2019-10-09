@@ -200,34 +200,6 @@ namespace ProductKeyManager.Service
             }
         }
 
-        ProductKey CreateProductKeyFromRequest(StoreProductKeyRequest request)
-        {
-            ProductKey productKey = new ProductKey();
-            productKey.Id = GenerateKeyId(request.Key);
-            productKey.StoreName = request.StoreName;
-            productKey.ProductName = request.ProductName;
-            productKey.Key = request.Key;
-            productKey.Owner = request.Owner;
-            productKey.Status = ProductKeyStatus.FromName(request.Status);
-            productKey.AddedDateTime = DateTime.Now;
-            productKey.UpdatedDateTime = productKey.AddedDateTime;
-
-            return productKey;
-        }
-
-        ProductKey CreateProductKeyFromRequest(UpdateProductKeyRequest request)
-        {
-            ProductKey productKey = new ProductKey();
-            productKey.Id = GenerateKeyId(request.Key);
-            productKey.StoreName = request.StoreName;
-            productKey.ProductName = request.ProductName;
-            productKey.Key = request.Key;
-            productKey.Owner = request.Owner;
-            productKey.Status = ProductKeyStatus.FromName(request.Status);
-
-            return productKey;
-        }
-
         bool DoesKeyExistInStore(string key)
         {
             string id = GenerateKeyId(key);
@@ -236,33 +208,15 @@ namespace ProductKeyManager.Service
 
         IEnumerable<ProductKey> FindProductKeys(GetProductKeyRequest request, int count)
         {
-            IEnumerable<ProductKeyEntity> productKeyCandidates = productKeyRepository.GetAll();
+            IEnumerable<ProductKeyEntity> productKeyCandidates = productKeyRepository
+                .GetAll()
+                .Where(x =>
+                    DoesPropertyMatchFilter(x.StoreName, request.StoreName) &&
+                    DoesPropertyMatchFilter(x.ProductName, request.ProductName) &&
+                    DoesPropertyMatchFilter(x.Owner, request.Owner) &&
+                    DoesPropertyMatchFilter(x.Status, request.Status));
 
-            if (!string.IsNullOrWhiteSpace(request.StoreName))
-            {
-                productKeyCandidates = productKeyCandidates.Where(
-                    x => x.StoreName.Equals(request.StoreName, StringComparison.InvariantCultureIgnoreCase));
-            }
-
-            if (!string.IsNullOrWhiteSpace(request.ProductName))
-            {
-                productKeyCandidates = productKeyCandidates.Where(
-                    x => x.ProductName.Equals( request.ProductName, StringComparison.InvariantCultureIgnoreCase));
-            }
-
-            if (!string.IsNullOrWhiteSpace(request.Owner))
-            {
-                productKeyCandidates = productKeyCandidates.Where(
-                    x => x.Status.Equals(request.Owner, StringComparison.InvariantCultureIgnoreCase));
-            }
-
-            if (!string.IsNullOrWhiteSpace(request.Status))
-            {
-                productKeyCandidates = productKeyCandidates.Where(
-                    x => x.Status.Equals(request.Status, StringComparison.InvariantCultureIgnoreCase));
-            }
-
-            IList<ProductKeyEntity> shuffledCandidates = ListExtensions.Shuffle(productKeyCandidates.ToList()).Distinct().ToList();
+            IList<ProductKeyEntity> shuffledCandidates = productKeyCandidates.Distinct().ToList().Shuffle();
             
             if (count > shuffledCandidates.Count)
             {
@@ -270,6 +224,16 @@ namespace ProductKeyManager.Service
             }
 
             return shuffledCandidates.ToServiceModels().Take(count);
+        }
+
+        bool DoesPropertyMatchFilter(string value, string filterValue)
+        {
+            if (string.IsNullOrWhiteSpace(filterValue))
+            {
+                return true;
+            }
+
+            return value.Equals(filterValue, StringComparison.InvariantCultureIgnoreCase);
         }
 
         void StoreProductKey(ProductKey productKey)
@@ -317,6 +281,34 @@ namespace ProductKeyManager.Service
 
                 return result.ToString();
             }
+        }
+
+        ProductKey CreateProductKeyFromRequest(StoreProductKeyRequest request)
+        {
+            ProductKey productKey = new ProductKey();
+            productKey.Id = GenerateKeyId(request.Key);
+            productKey.StoreName = request.StoreName;
+            productKey.ProductName = request.ProductName;
+            productKey.Key = request.Key;
+            productKey.Owner = request.Owner;
+            productKey.Status = ProductKeyStatus.FromName(request.Status);
+            productKey.AddedDateTime = DateTime.Now;
+            productKey.UpdatedDateTime = productKey.AddedDateTime;
+
+            return productKey;
+        }
+
+        ProductKey CreateProductKeyFromRequest(UpdateProductKeyRequest request)
+        {
+            ProductKey productKey = new ProductKey();
+            productKey.Id = GenerateKeyId(request.Key);
+            productKey.StoreName = request.StoreName;
+            productKey.ProductName = request.ProductName;
+            productKey.Key = request.Key;
+            productKey.Owner = request.Owner;
+            productKey.Status = ProductKeyStatus.FromName(request.Status);
+
+            return productKey;
         }
     }
 }
