@@ -52,7 +52,10 @@ namespace ProductKeyManager.Service
             IEnumerable<LogInfo> logInfos = new List<LogInfo>
             {
                 new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
-                new LogInfo(MyLogInfoKey.ProductName, request.ProductName)
+                new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
+                new LogInfo(MyLogInfoKey.Owner, request.Owner),
+                new LogInfo(MyLogInfoKey.Status, request.Status),
+                new LogInfo(MyLogInfoKey.Count, request.Count)
             };
 
             logger.Info(MyOperation.GetProductKey, OperationStatus.Started, logInfos);
@@ -83,7 +86,9 @@ namespace ProductKeyManager.Service
             {
                 new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
                 new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
-                new LogInfo(MyLogInfoKey.Key, request.Key)
+                new LogInfo(MyLogInfoKey.Key, request.Key),
+                new LogInfo(MyLogInfoKey.Owner, request.Owner),
+                new LogInfo(MyLogInfoKey.Status, request.Status)
             };
 
             logger.Info(MyOperation.StoreProductKey, OperationStatus.Started, logInfos);
@@ -102,7 +107,9 @@ namespace ProductKeyManager.Service
             {
                 new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
                 new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
-                new LogInfo(MyLogInfoKey.Key, request.Key)
+                new LogInfo(MyLogInfoKey.Key, request.Key),
+                new LogInfo(MyLogInfoKey.Owner, request.Owner),
+                new LogInfo(MyLogInfoKey.Status, request.Status)
             };
 
             logger.Info(MyOperation.UpdateProductKey, OperationStatus.Started, logInfos);
