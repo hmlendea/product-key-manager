@@ -53,6 +53,7 @@ namespace ProductKeyManager.Service
             {
                 new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
                 new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
+                new LogInfo(MyLogInfoKey.Key, request.Key),
                 new LogInfo(MyLogInfoKey.Owner, request.Owner),
                 new LogInfo(MyLogInfoKey.Status, request.Status),
                 new LogInfo(MyLogInfoKey.Count, request.Count)
@@ -135,7 +136,8 @@ namespace ProductKeyManager.Service
                     OperationStatus.Failure,
                     ex,
                     new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
-                    new LogInfo(MyLogInfoKey.ProductName, request.ProductName));
+                    new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
+                    new LogInfo(MyLogInfoKey.Key, request.Key));
 
                 throw ex;
             }
@@ -220,6 +222,7 @@ namespace ProductKeyManager.Service
                 .Where(x =>
                     DoesPropertyMatchFilter(x.StoreName, request.StoreName) &&
                     DoesPropertyMatchFilter(x.ProductName, request.ProductName) &&
+                    DoesPropertyMatchFilter(x.Key, request.Key) &&
                     DoesPropertyMatchFilter(x.Owner, request.Owner) &&
                     DoesPropertyMatchFilter(x.Status, request.Status));
 
