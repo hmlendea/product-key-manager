@@ -17,6 +17,8 @@ namespace ProductKeyManager
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddControllers();
+
             services
                 .AddConfigurations(Configuration)
                 .AddCustomServices();

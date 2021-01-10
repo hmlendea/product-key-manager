@@ -243,6 +243,11 @@ namespace ProductKeyManager.Service
                 return true;
             }
 
+            if (value is null)
+            {
+                return false;
+            }
+
             return value.Equals(filterValue, StringComparison.InvariantCultureIgnoreCase);
         }
 
