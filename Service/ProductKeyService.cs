@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 
 using NuciDAL.Repositories;
 using NuciExtensions;
@@ -248,7 +249,14 @@ namespace ProductKeyManager.Service
                 return false;
             }
 
-            return value.Equals(filterValue, StringComparison.InvariantCultureIgnoreCase);
+            string pattern = filterValue;
+
+            if (pattern[0] != '^' && pattern[pattern.Length - 1] != '$')
+            {
+                pattern = $"^{pattern}$";
+            }
+
+            return Regex.IsMatch(value, pattern);
         }
 
         void StoreProductKey(ProductKey productKey)
