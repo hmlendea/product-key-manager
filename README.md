@@ -1,1 +1,1 @@
-[![Build Status](https://travis-ci.com/hmlendea/product-key-manager.svg?branch=master)](https://travis-ci.com/hmlendea/product-key-manager)
+[![Build Status](https://github.com/hmlendea/product-key-manager/actions/workflows/dotnet.yml/badge.svg)](https://github.com/hmlendea/product-key-manager/actions/workflows/dotnet.yml)
