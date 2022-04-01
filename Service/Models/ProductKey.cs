@@ -14,6 +14,8 @@ namespace ProductKeyManager.Service.Models
 
         public string Owner { get; set; }
 
+        public string ConfirmationCode { get; set; }
+
         public ProductKeyStatus Status { get; set; }
 
         public DateTime AddedDateTime { get; set; }

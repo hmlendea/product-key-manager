@@ -21,6 +21,7 @@ namespace ProductKeyManager.Service.Mapping
             serviceModel.ProductName = dataObject.ProductName;
             serviceModel.Key = dataObject.Key;
             serviceModel.Owner = dataObject.Owner;
+            serviceModel.ConfirmationCode = dataObject.ConfirmationCode;
             serviceModel.Status = ProductKeyStatus.FromName(dataObject.Status);
             serviceModel.AddedDateTime = DateTime.ParseExact(dataObject.AddedDateTime, DateTimeFormat, CultureInfo.InvariantCulture);
             serviceModel.UpdatedDateTime = DateTime.ParseExact(dataObject.UpdatedDateTime, DateTimeFormat, CultureInfo.InvariantCulture);
@@ -36,6 +37,7 @@ namespace ProductKeyManager.Service.Mapping
             dataObject.ProductName = serviceModel.ProductName;
             dataObject.Key = serviceModel.Key;
             dataObject.Owner = serviceModel.Owner;
+            dataObject.ConfirmationCode = serviceModel.ConfirmationCode;
             dataObject.Status = serviceModel.Status.Name;
             dataObject.AddedDateTime = serviceModel.AddedDateTime.ToString(DateTimeFormat);
             dataObject.UpdatedDateTime = serviceModel.UpdatedDateTime.ToString(DateTimeFormat);
