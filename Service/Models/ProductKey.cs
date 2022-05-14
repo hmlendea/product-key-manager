@@ -5,7 +5,7 @@ namespace ProductKeyManager.Service.Models
     public sealed class ProductKey
     {
         public string Id { get; set; }
-        
+
         public string StoreName { get; set; }
 
         public string ProductName { get; set; }
@@ -15,6 +15,8 @@ namespace ProductKeyManager.Service.Models
         public string Owner { get; set; }
 
         public string ConfirmationCode { get; set; }
+
+        public string Comment { get; set; }
 
         public ProductKeyStatus Status { get; set; }
 

@@ -10,6 +10,8 @@ namespace ProductKeyManager.Api.Models
 
         public string Owner { get; set; }
 
+        public string Comment { get; set; }
+
         public string Status { get; set; }
     }
 }
