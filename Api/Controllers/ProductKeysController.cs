@@ -67,6 +67,7 @@ namespace ProductKeyManager.Controllers
             [FromQuery] string product,
             [FromQuery] string key,
             [FromQuery] string owner,
+            [FromQuery] string comment,
             [FromQuery] string status,
             [FromQuery] string hmac)
         {
@@ -78,6 +79,7 @@ namespace ProductKeyManager.Controllers
                     ProductName = product,
                     Key = key,
                     Owner = owner,
+                    Comment = comment,
                     Status = status,
                     HmacToken = hmac
                 };
@@ -99,6 +101,7 @@ namespace ProductKeyManager.Controllers
             [FromQuery] string product,
             [FromQuery] string key,
             [FromQuery] string owner,
+            [FromQuery] string comment,
             [FromQuery] string status,
             [FromQuery] string hmac)
         {
@@ -110,6 +113,7 @@ namespace ProductKeyManager.Controllers
                     ProductName = product,
                     Key = key,
                     Owner = owner,
+                    Comment = comment,
                     Status = status,
                     HmacToken = hmac
                 };

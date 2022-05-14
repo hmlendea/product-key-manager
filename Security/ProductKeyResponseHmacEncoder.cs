@@ -16,18 +16,17 @@ namespace ProductKeyManager.Security
                 {
                     continue;
                 }
-                
+
                 stringForSigning +=
                     productKey.Store +
                     productKey.Product +
                     productKey.Key +
                     productKey.Owner +
+                    productKey.Comment +
                     productKey.Status;
             }
 
-            string hmacToken = ComputeHmacToken(stringForSigning, sharedSecretKey);
-
-            return hmacToken;
+            return ComputeHmacToken(stringForSigning, sharedSecretKey);
         }
     }
 }

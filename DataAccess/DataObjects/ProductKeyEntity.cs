@@ -14,6 +14,8 @@ namespace ProductKeyManager.DataAccess.DataObjects
 
         public string ConfirmationCode { get; set; }
 
+        public string Comment { get; set; }
+
         public string Status { get; set; }
 
         public string AddedDateTime { get; set; }

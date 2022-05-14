@@ -90,7 +90,8 @@ namespace ProductKeyManager.Service
                 new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
                 new LogInfo(MyLogInfoKey.Key, request.Key),
                 new LogInfo(MyLogInfoKey.Owner, request.Owner),
-                new LogInfo(MyLogInfoKey.Status, request.Status)
+                new LogInfo(MyLogInfoKey.Status, request.Status),
+                new LogInfo(MyLogInfoKey.Comment, request.Comment)
             };
 
             logger.Info(MyOperation.StoreProductKey, OperationStatus.Started, logInfos);
@@ -111,19 +112,20 @@ namespace ProductKeyManager.Service
                 new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
                 new LogInfo(MyLogInfoKey.Key, request.Key),
                 new LogInfo(MyLogInfoKey.Owner, request.Owner),
-                new LogInfo(MyLogInfoKey.Status, request.Status)
+                new LogInfo(MyLogInfoKey.Status, request.Status),
+                new LogInfo(MyLogInfoKey.Comment, request.Comment)
             };
 
             logger.Info(MyOperation.UpdateProductKey, OperationStatus.Started, logInfos);
 
             ValidateUpdateRequest(request);
-            
+
             ProductKey productKey = CreateProductKeyFromRequest(request);
             UpdateProductKeyDetails(productKey);
 
             logger.Debug(MyOperation.UpdateProductKey, OperationStatus.Success, logInfos);
         }
-        
+
         void ValidateGetRequest(GetProductKeyRequest request)
         {
             bool isTokenValid = getRequestEncoder.IsTokenValid(request.HmacToken, request, securitySettings.SharedSecretKey);
@@ -143,7 +145,7 @@ namespace ProductKeyManager.Service
                 throw ex;
             }
         }
-        
+
         void ValidateStoreRequest(StoreProductKeyRequest request)
         {
             bool isTokenValid = storeRequestEncoder.IsTokenValid(request.HmacToken, request, securitySettings.SharedSecretKey);
@@ -176,7 +178,7 @@ namespace ProductKeyManager.Service
                 throw exception;
             }
         }
-        
+
         void ValidateUpdateRequest(UpdateProductKeyRequest request)
         {
             bool isTokenValid = updateRequestEncoder.IsTokenValid(request.HmacToken, request, securitySettings.SharedSecretKey);
@@ -228,7 +230,7 @@ namespace ProductKeyManager.Service
                     DoesPropertyMatchFilter(x.Status, request.Status));
 
             IList<ProductKeyEntity> shuffledCandidates = productKeyCandidates.Distinct().ToList().Shuffle();
-            
+
             if (count > shuffledCandidates.Count)
             {
                 count = shuffledCandidates.Count;
@@ -273,12 +275,12 @@ namespace ProductKeyManager.Service
             {
                 productKeyToUpdate.StoreName = productKey.StoreName;
             }
-            
+
             if (!string.IsNullOrWhiteSpace(productKey.ProductName))
             {
                 productKeyToUpdate.ProductName = productKey.ProductName;
             }
-            
+
             if (!string.IsNullOrWhiteSpace(productKey.Owner))
             {
                 productKeyToUpdate.Owner = productKey.Owner;
@@ -314,6 +316,7 @@ namespace ProductKeyManager.Service
             productKey.ProductName = request.ProductName;
             productKey.Key = request.Key;
             productKey.Owner = request.Owner;
+            productKey.Comment = request.Comment;
             productKey.Status = ProductKeyStatus.FromName(request.Status);
             productKey.AddedDateTime = DateTime.Now;
             productKey.UpdatedDateTime = productKey.AddedDateTime;
@@ -329,6 +332,7 @@ namespace ProductKeyManager.Service
             productKey.ProductName = request.ProductName;
             productKey.Key = request.Key;
             productKey.Owner = request.Owner;
+            productKey.Comment = request.Comment;
             productKey.Status = ProductKeyStatus.FromName(request.Status);
 
             return productKey;

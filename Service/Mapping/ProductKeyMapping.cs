@@ -12,7 +12,7 @@ namespace ProductKeyManager.Service.Mapping
     static class ProductKeyMappings
     {
         const string DateTimeFormat = "yyyy.MM.ddTHH:mm:ss.ffffzzz";
-        
+
         internal static ProductKey ToServiceModel(this ProductKeyEntity dataObject)
         {
             ProductKey serviceModel = new ProductKey();
@@ -22,6 +22,7 @@ namespace ProductKeyManager.Service.Mapping
             serviceModel.Key = dataObject.Key;
             serviceModel.Owner = dataObject.Owner;
             serviceModel.ConfirmationCode = dataObject.ConfirmationCode;
+            serviceModel.Comment = dataObject.Comment;
             serviceModel.Status = ProductKeyStatus.FromName(dataObject.Status);
             serviceModel.AddedDateTime = DateTime.ParseExact(dataObject.AddedDateTime, DateTimeFormat, CultureInfo.InvariantCulture);
             serviceModel.UpdatedDateTime = DateTime.ParseExact(dataObject.UpdatedDateTime, DateTimeFormat, CultureInfo.InvariantCulture);
@@ -38,6 +39,7 @@ namespace ProductKeyManager.Service.Mapping
             dataObject.Key = serviceModel.Key;
             dataObject.Owner = serviceModel.Owner;
             dataObject.ConfirmationCode = serviceModel.ConfirmationCode;
+            dataObject.Comment = serviceModel.Comment;
             dataObject.Status = serviceModel.Status.Name;
             dataObject.AddedDateTime = serviceModel.AddedDateTime.ToString(DateTimeFormat);
             dataObject.UpdatedDateTime = serviceModel.UpdatedDateTime.ToString(DateTimeFormat);
@@ -52,6 +54,7 @@ namespace ProductKeyManager.Service.Mapping
             apiObject.Product = serviceModel.ProductName;
             apiObject.Key = serviceModel.Key;
             apiObject.Owner = serviceModel.Owner;
+            apiObject.Comment = serviceModel.Comment;
             apiObject.Status = serviceModel.Status.Name;
 
             return apiObject;
