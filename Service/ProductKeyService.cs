@@ -286,7 +286,7 @@ namespace ProductKeyManager.Service
                 productKeyToUpdate.Owner = productKey.Owner;
             }
 
-            if (!string.IsNullOrWhiteSpace(productKey.Owner))
+            if (!string.IsNullOrWhiteSpace(productKey.Comment))
             {
                 productKeyToUpdate.Comment = productKey.Comment;
             }
