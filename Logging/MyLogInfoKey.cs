@@ -7,7 +7,7 @@ namespace ProductKeyManager.Logging
         MyLogInfoKey(string name)
             : base(name)
         {
-            
+
         }
 
         public static LogInfoKey StoreName => new MyLogInfoKey(nameof(StoreName));
@@ -15,6 +15,8 @@ namespace ProductKeyManager.Logging
         public static LogInfoKey ProductName => new MyLogInfoKey(nameof(ProductName));
 
         public static LogInfoKey Owner => new MyLogInfoKey(nameof(Owner));
+
+        public static LogInfoKey Comment => new MyLogInfoKey(nameof(Comment));
 
         public static LogInfoKey Status => new MyLogInfoKey(nameof(Status));
 
