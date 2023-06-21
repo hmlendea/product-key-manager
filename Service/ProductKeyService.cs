@@ -130,7 +130,7 @@ namespace ProductKeyManager.Service
         {
             bool isTokenValid = getRequestEncoder.IsTokenValid(request.HmacToken, request, securitySettings.SharedSecretKey);
 
-            if (!isTokenValid && securitySettings.IsEnabled)
+            if (!isTokenValid)
             {
                 AuthenticationException ex = new AuthenticationException("The provided HMAC token is not valid");
 
@@ -152,7 +152,7 @@ namespace ProductKeyManager.Service
 
             Exception exception = null;
 
-            if (!isTokenValid && securitySettings.IsEnabled)
+            if (!isTokenValid)
             {
                 exception = new AuthenticationException("The provided HMAC token is not valid");
             }
@@ -185,7 +185,7 @@ namespace ProductKeyManager.Service
 
             Exception exception = null;
 
-            if (!isTokenValid && securitySettings.IsEnabled)
+            if (!isTokenValid)
             {
                 exception = new AuthenticationException("The provided HMAC token is not valid");
             }
