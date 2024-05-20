@@ -64,7 +64,9 @@ namespace ProductKeyManager.Service
 
             ValidateGetRequest(request);
 
-            IEnumerable<ProductKey> productKeys = FindProductKeys(request, request.Count);
+            IEnumerable<ProductKey> productKeys = FindProductKeys(request, request.Count)
+                .OrderBy(x => x.ProductName)
+                .ThenBy(x => x.Key);
 
             if (productKeys?.Count() == 0)
             {
