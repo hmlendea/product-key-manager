@@ -11,7 +11,7 @@ namespace ProductKeyManager.Api.Models
 
         public ProductKeyResponse(ProductKeyObject productKey)
         {
-            ProductKeys = new List<ProductKeyObject> { productKey };
+            ProductKeys = [productKey];
         }
 
         public ProductKeyResponse(IEnumerable<ProductKeyObject> productKeys)

@@ -6,7 +6,7 @@ namespace ProductKeyManager.Service.Models
 {
     public sealed class ProductKeyStatus : IEquatable<ProductKeyStatus>
     {
-        static Dictionary<string, ProductKeyStatus> entries = new Dictionary<string, ProductKeyStatus>
+        static readonly Dictionary<string, ProductKeyStatus> entries = new()
         {
             { Unknown.Name, Unknown },
             { Used.Name, Used },
@@ -19,21 +19,17 @@ namespace ProductKeyManager.Service.Models
 
         public string Name { get; }
 
-        ProductKeyStatus(string name)
-        {
-            Name = name;
-        }
+        ProductKeyStatus(string name) => Name = name;
 
-        public static ProductKeyStatus Unknown => new ProductKeyStatus(nameof(Unknown));
-        public static ProductKeyStatus Used => new ProductKeyStatus(nameof(Used));
-        public static ProductKeyStatus Vacant => new ProductKeyStatus(nameof(Vacant));
-        public static ProductKeyStatus Invalid => new ProductKeyStatus(nameof(Invalid));
-        public static ProductKeyStatus AlreadyOwned => new ProductKeyStatus(nameof(AlreadyOwned));
-        public static ProductKeyStatus RequiresBaseProduct => new ProductKeyStatus(nameof(RequiresBaseProduct));
-        public static ProductKeyStatus RegionLocked => new ProductKeyStatus(nameof(RegionLocked));
+        public static ProductKeyStatus Unknown => new(nameof(Unknown));
+        public static ProductKeyStatus Used => new(nameof(Used));
+        public static ProductKeyStatus Vacant => new(nameof(Vacant));
+        public static ProductKeyStatus Invalid => new(nameof(Invalid));
+        public static ProductKeyStatus AlreadyOwned => new(nameof(AlreadyOwned));
+        public static ProductKeyStatus RequiresBaseProduct => new(nameof(RequiresBaseProduct));
+        public static ProductKeyStatus RegionLocked => new(nameof(RegionLocked));
 
-        public static IEnumerable<ProductKeyStatus> Values
-            => entries.Values;
+        public static IEnumerable<ProductKeyStatus> Values => entries.Values;
 
         public static ProductKeyStatus FromName(string name)
         {
@@ -81,7 +77,7 @@ namespace ProductKeyManager.Service.Models
 
             return Equals((ProductKeyStatus)obj);
         }
-        
+
         public static bool operator == (ProductKeyStatus first, ProductKeyStatus second)
         {
             if (first is null)
