@@ -25,18 +25,9 @@ namespace ProductKeyManager.Api.Controllers
                     Key = query.Key,
                     Owner = query.Owner,
                     Status = query.Status,
+                    Count = query.Count ?? 1,
                     HmacToken = query.Hmac
                 };
-
-                if (string.IsNullOrWhiteSpace(query.Hmac))
-                {
-                    request.Count = 1;
-                }
-                else
-                {
-                    int.TryParse(query.Hmac, out int parsedCount);
-                    request.Count = Math.Max(1, parsedCount);
-                }
 
                 ProductKeyResponse response = service.GetProductKey(request);
                 return Ok(response);
