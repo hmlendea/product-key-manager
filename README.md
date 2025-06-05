@@ -82,17 +82,6 @@ API requests are secured using HMAC validation:
 2. Send HMAC as query param
 3. Service will verify authenticity
 
-
----
-
-
-## 🛠️ Deployment
-
-```bash
-sh release.sh 2.5.0
-```
-
-
 ---
 
 ## 💖 Support
@@ -103,4 +92,4 @@ If this project helps you, consider [donating](https://hmlendea.go.ro/fund.html)
 
 ## 📄 License
 
-GPL-3.0 © [hmlendea](https://github.com/hmlendea)
+[GPL-3.0](https://github.com/hmlendea/product-key-manager/blob/master/LICENSE) © [hmlendea](https://github.com/hmlendea)
