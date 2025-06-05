@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using ProductKeyManager.Api.Models;
 using ProductKeyManager.Service;
 
-namespace ProductKeyManager.Controllers
+namespace ProductKeyManager.Api.Controllers
 {
     [Route("[controller]")]
     [ApiController]
