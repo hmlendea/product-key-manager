@@ -9,44 +9,32 @@ namespace ProductKeyManager.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class ProductKeysController : ControllerBase
+    public class ProductKeysController(IProductKeyService service) : ControllerBase
     {
-        readonly IProductKeyService service;
-
-        public ProductKeysController(IProductKeyService service)
-        {
-            this.service = service;
-        }
+        readonly IProductKeyService service = service;
 
         [HttpGet]
-        public ActionResult GetProductKey(
-            [FromQuery] string store,
-            [FromQuery] string product,
-            [FromQuery] string key,
-            [FromQuery] string owner,
-            [FromQuery] string status,
-            [FromQuery] string count,
-            [FromQuery] string hmac)
+        public ActionResult GetProductKey([FromQuery] ProductKeyQuery query)
         {
             try
             {
                 GetProductKeyRequest request = new()
                 {
-                    StoreName = store,
-                    ProductName = product,
-                    Key = key,
-                    Owner = owner,
-                    Status = status,
-                    HmacToken = hmac
+                    StoreName = query.Store,
+                    ProductName = query.Product,
+                    Key = query.Key,
+                    Owner = query.Owner,
+                    Status = query.Status,
+                    HmacToken = query.Hmac
                 };
 
-                if (string.IsNullOrWhiteSpace(count))
+                if (string.IsNullOrWhiteSpace(query.Hmac))
                 {
                     request.Count = 1;
                 }
                 else
                 {
-                    int.TryParse(count, out int parsedCount);
+                    int.TryParse(query.Hmac, out int parsedCount);
                     request.Count = Math.Max(1, parsedCount);
                 }
 
@@ -61,26 +49,19 @@ namespace ProductKeyManager.Controllers
         }
 
         [HttpPost]
-        public ActionResult StoreProductKey(
-            [FromQuery] string store,
-            [FromQuery] string product,
-            [FromQuery] string key,
-            [FromQuery] string owner,
-            [FromQuery] string comment,
-            [FromQuery] string status,
-            [FromQuery] string hmac)
+        public ActionResult StoreProductKey([FromQuery] ProductKeyQuery query)
         {
             try
             {
                 StoreProductKeyRequest request = new()
                 {
-                    StoreName = store,
-                    ProductName = product,
-                    Key = key,
-                    Owner = owner,
-                    Comment = comment,
-                    Status = status,
-                    HmacToken = hmac
+                    StoreName = query.Store,
+                    ProductName = query.Product,
+                    Key = query.Key,
+                    Owner = query.Owner,
+                    Comment = query.Comment,
+                    Status = query.Status,
+                    HmacToken = query.Hmac
                 };
 
                 service.StoreProductKey(request);
@@ -95,26 +76,19 @@ namespace ProductKeyManager.Controllers
         }
 
         [HttpPut]
-        public ActionResult UpdateProductKey(
-            [FromQuery] string store,
-            [FromQuery] string product,
-            [FromQuery] string key,
-            [FromQuery] string owner,
-            [FromQuery] string comment,
-            [FromQuery] string status,
-            [FromQuery] string hmac)
+        public ActionResult UpdateProductKey([FromQuery] ProductKeyQuery query)
         {
             try
             {
                 UpdateProductKeyRequest request = new()
                 {
-                    StoreName = store,
-                    ProductName = product,
-                    Key = key,
-                    Owner = owner,
-                    Comment = comment,
-                    Status = status,
-                    HmacToken = hmac
+                    StoreName = query.Store,
+                    ProductName = query.Product,
+                    Key = query.Key,
+                    Owner = query.Owner,
+                    Comment = query.Comment,
+                    Status = query.Status,
+                    HmacToken = query.Hmac
                 };
 
                 service.UpdateProductKey(request);
