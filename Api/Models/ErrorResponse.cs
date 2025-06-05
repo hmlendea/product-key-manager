@@ -8,14 +8,8 @@ namespace ProductKeyManager.Api.Models
 
         public string Message { get; }
 
-        public ErrorResponse(string message)
-        {
-            Message = message;
-        }
+        public ErrorResponse(string message) => Message = message;
 
-        public ErrorResponse(Exception exception)
-        {
-            Message = exception.Message;
-        }
+        public ErrorResponse(Exception exception) => Message = exception.Message;
     }
 }

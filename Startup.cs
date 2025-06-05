@@ -6,14 +6,9 @@ using Microsoft.Extensions.Hosting;
 
 namespace ProductKeyManager
 {
-    public class Startup
+    public class Startup(IConfiguration configuration)
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
-        public IConfiguration Configuration { get; }
+        public IConfiguration Configuration => configuration;
 
         public void ConfigureServices(IServiceCollection services)
         {

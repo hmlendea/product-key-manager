@@ -20,45 +20,34 @@ using ProductKeyManager.Service.Models;
 
 namespace ProductKeyManager.Service
 {
-    public class ProductKeyService : IProductKeyService
+    public class ProductKeyService(
+        IRepository<ProductKeyEntity> productKeyRepository,
+        IHmacEncoder<GetProductKeyRequest> getRequestEncoder,
+        IHmacEncoder<StoreProductKeyRequest> storeRequestEncoder,
+        IHmacEncoder<UpdateProductKeyRequest> updateRequestEncoder,
+        IHmacEncoder<ProductKeyResponse> productKeyResponseEncoder,
+        SecuritySettings securitySettings,
+        ILogger logger) : IProductKeyService
     {
-        readonly IRepository<ProductKeyEntity> productKeyRepository;
-        readonly IHmacEncoder<GetProductKeyRequest> getRequestEncoder;
-        readonly IHmacEncoder<StoreProductKeyRequest> storeRequestEncoder;
-        readonly IHmacEncoder<UpdateProductKeyRequest> updateRequestEncoder;
-        readonly IHmacEncoder<ProductKeyResponse> productKeyResponseEncoder;
-        readonly SecuritySettings securitySettings;
-        readonly ILogger logger;
-
-        public ProductKeyService(
-            IRepository<ProductKeyEntity> productKeyRepository,
-            IHmacEncoder<GetProductKeyRequest> getRequestEncoder,
-            IHmacEncoder<StoreProductKeyRequest> storeRequestEncoder,
-            IHmacEncoder<UpdateProductKeyRequest> updateRequestEncoder,
-            IHmacEncoder<ProductKeyResponse> productKeyResponseEncoder,
-            SecuritySettings securitySettings,
-            ILogger logger)
-        {
-            this.productKeyRepository = productKeyRepository;
-            this.getRequestEncoder = getRequestEncoder;
-            this.storeRequestEncoder = storeRequestEncoder;
-            this.updateRequestEncoder = updateRequestEncoder;
-            this.productKeyResponseEncoder = productKeyResponseEncoder;
-            this.securitySettings = securitySettings;
-            this.logger = logger;
-        }
+        readonly IRepository<ProductKeyEntity> productKeyRepository = productKeyRepository;
+        readonly IHmacEncoder<GetProductKeyRequest> getRequestEncoder = getRequestEncoder;
+        readonly IHmacEncoder<StoreProductKeyRequest> storeRequestEncoder = storeRequestEncoder;
+        readonly IHmacEncoder<UpdateProductKeyRequest> updateRequestEncoder = updateRequestEncoder;
+        readonly IHmacEncoder<ProductKeyResponse> productKeyResponseEncoder = productKeyResponseEncoder;
+        readonly SecuritySettings securitySettings = securitySettings;
+        readonly ILogger logger = logger;
 
         public ProductKeyResponse GetProductKey(GetProductKeyRequest request)
         {
-            IEnumerable<LogInfo> logInfos = new List<LogInfo>
-            {
-                new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
-                new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
-                new LogInfo(MyLogInfoKey.Key, request.Key),
-                new LogInfo(MyLogInfoKey.Owner, request.Owner),
-                new LogInfo(MyLogInfoKey.Status, request.Status),
-                new LogInfo(MyLogInfoKey.Count, request.Count)
-            };
+            IEnumerable<LogInfo> logInfos =
+            [
+                new(MyLogInfoKey.StoreName, request.StoreName),
+                new(MyLogInfoKey.ProductName, request.ProductName),
+                new(MyLogInfoKey.Key, request.Key),
+                new(MyLogInfoKey.Owner, request.Owner),
+                new(MyLogInfoKey.Status, request.Status),
+                new(MyLogInfoKey.Count, request.Count)
+            ];
 
             logger.Info(MyOperation.GetProductKey, OperationStatus.Started, logInfos);
 
@@ -76,7 +65,7 @@ namespace ProductKeyManager.Service
                 throw ex;
             }
 
-            ProductKeyResponse response = new ProductKeyResponse(productKeys.ToApiObjects());
+            ProductKeyResponse response = new(productKeys.ToApiObjects());
             response.HmacToken = productKeyResponseEncoder.GenerateToken(response, securitySettings.SharedSecretKey);
 
             logger.Info(MyOperation.GetProductKey, OperationStatus.Success, logInfos);
@@ -86,15 +75,15 @@ namespace ProductKeyManager.Service
 
         public void StoreProductKey(StoreProductKeyRequest request)
         {
-            IEnumerable<LogInfo> logInfos = new List<LogInfo>
-            {
-                new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
-                new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
-                new LogInfo(MyLogInfoKey.Key, request.Key),
-                new LogInfo(MyLogInfoKey.Owner, request.Owner),
-                new LogInfo(MyLogInfoKey.Status, request.Status),
-                new LogInfo(MyLogInfoKey.Comment, request.Comment)
-            };
+            IEnumerable<LogInfo> logInfos =
+            [
+                new(MyLogInfoKey.StoreName, request.StoreName),
+                new(MyLogInfoKey.ProductName, request.ProductName),
+                new(MyLogInfoKey.Key, request.Key),
+                new(MyLogInfoKey.Owner, request.Owner),
+                new(MyLogInfoKey.Status, request.Status),
+                new(MyLogInfoKey.Comment, request.Comment)
+            ];
 
             logger.Info(MyOperation.StoreProductKey, OperationStatus.Started, logInfos);
 
@@ -108,15 +97,15 @@ namespace ProductKeyManager.Service
 
         public void UpdateProductKey(UpdateProductKeyRequest request)
         {
-            IEnumerable<LogInfo> logInfos = new List<LogInfo>
-            {
-                new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
-                new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
-                new LogInfo(MyLogInfoKey.Key, request.Key),
-                new LogInfo(MyLogInfoKey.Owner, request.Owner),
-                new LogInfo(MyLogInfoKey.Status, request.Status),
-                new LogInfo(MyLogInfoKey.Comment, request.Comment)
-            };
+            IEnumerable<LogInfo> logInfos =
+            [
+                new(MyLogInfoKey.StoreName, request.StoreName),
+                new(MyLogInfoKey.ProductName, request.ProductName),
+                new(MyLogInfoKey.Key, request.Key),
+                new(MyLogInfoKey.Owner, request.Owner),
+                new(MyLogInfoKey.Status, request.Status),
+                new(MyLogInfoKey.Comment, request.Comment)
+            ];
 
             logger.Info(MyOperation.UpdateProductKey, OperationStatus.Started, logInfos);
 
@@ -130,31 +119,29 @@ namespace ProductKeyManager.Service
 
         void ValidateGetRequest(GetProductKeyRequest request)
         {
-            bool isTokenValid = getRequestEncoder.IsTokenValid(request.HmacToken, request, securitySettings.SharedSecretKey);
-
-            if (!isTokenValid)
+            if (getRequestEncoder.IsTokenValid(request.HmacToken, request, securitySettings.SharedSecretKey))
             {
-                AuthenticationException ex = new AuthenticationException("The provided HMAC token is not valid");
-
-                logger.Error(
-                    MyOperation.GetProductKey,
-                    OperationStatus.Failure,
-                    ex,
-                    new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
-                    new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
-                    new LogInfo(MyLogInfoKey.Key, request.Key));
-
-                throw ex;
+                return;
             }
+
+            AuthenticationException exception = new("The provided HMAC token is not valid");
+
+            logger.Error(
+                MyOperation.GetProductKey,
+                OperationStatus.Failure,
+                exception,
+                new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
+                new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
+                new LogInfo(MyLogInfoKey.Key, request.Key));
+
+            throw exception;
         }
 
         void ValidateStoreRequest(StoreProductKeyRequest request)
         {
-            bool isTokenValid = storeRequestEncoder.IsTokenValid(request.HmacToken, request, securitySettings.SharedSecretKey);
+            Exception exception;
 
-            Exception exception = null;
-
-            if (!isTokenValid)
+            if (!storeRequestEncoder.IsTokenValid(request.HmacToken, request, securitySettings.SharedSecretKey))
             {
                 exception = new AuthenticationException("The provided HMAC token is not valid");
             }
@@ -166,28 +153,27 @@ namespace ProductKeyManager.Service
             {
                 exception = new ArgumentException("The specified product key already exists");
             }
-
-            if (!(exception is null))
+            else
             {
-                logger.Error(
-                    MyOperation.StoreProductKey,
-                    OperationStatus.Failure,
-                    exception,
-                    new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
-                    new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
-                    new LogInfo(MyLogInfoKey.Key, request.Key));
-
-                throw exception;
+                return;
             }
+
+            logger.Error(
+                MyOperation.StoreProductKey,
+                OperationStatus.Failure,
+                exception,
+                new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
+                new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
+                new LogInfo(MyLogInfoKey.Key, request.Key));
+
+            throw exception;
         }
 
         void ValidateUpdateRequest(UpdateProductKeyRequest request)
         {
-            bool isTokenValid = updateRequestEncoder.IsTokenValid(request.HmacToken, request, securitySettings.SharedSecretKey);
+            Exception exception;
 
-            Exception exception = null;
-
-            if (!isTokenValid)
+            if (!updateRequestEncoder.IsTokenValid(request.HmacToken, request, securitySettings.SharedSecretKey))
             {
                 exception = new AuthenticationException("The provided HMAC token is not valid");
             }
@@ -199,26 +185,24 @@ namespace ProductKeyManager.Service
             {
                 exception = new ArgumentException("The specified product key does not exist");
             }
-
-            if (!(exception is null))
+            else
             {
-                logger.Error(
-                    MyOperation.UpdateProductKey,
-                    OperationStatus.Failure,
-                    exception,
-                    new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
-                    new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
-                    new LogInfo(MyLogInfoKey.Key, request.Key));
-
-                throw exception;
+                return;
             }
+
+            logger.Error(
+                MyOperation.UpdateProductKey,
+                OperationStatus.Failure,
+                exception,
+                new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
+                new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
+                new LogInfo(MyLogInfoKey.Key, request.Key));
+
+            throw exception;
         }
 
         bool DoesKeyExistInStore(string key)
-        {
-            string id = GenerateKeyId(key);
-            return productKeyRepository.TryGet(id) != null;
-        }
+            => productKeyRepository.TryGet(GenerateKeyId(key)) is not null;
 
         IEnumerable<ProductKey> FindProductKeys(GetProductKeyRequest request, int count)
         {
@@ -241,7 +225,7 @@ namespace ProductKeyManager.Service
             return shuffledCandidates.ToServiceModels().Take(count);
         }
 
-        bool DoesPropertyMatchFilter(string value, string filterValue)
+        static bool DoesPropertyMatchFilter(string value, string filterValue)
         {
             if (string.IsNullOrWhiteSpace(filterValue))
             {
@@ -304,45 +288,36 @@ namespace ProductKeyManager.Service
             productKeyRepository.ApplyChanges();
         }
 
-        string GenerateKeyId(string key)
+        static string GenerateKeyId(string key)
+            => new Guid(MD5.HashData(Encoding.Default.GetBytes(key))).ToString();
+
+        static ProductKey CreateProductKeyFromRequest(StoreProductKeyRequest request)
         {
-            using (MD5 md5 = MD5.Create())
+            ProductKey productKey = new()
             {
-                byte[] hash = md5.ComputeHash(Encoding.Default.GetBytes(key));
-                Guid result = new Guid(hash);
-
-                return result.ToString();
-            }
-        }
-
-        ProductKey CreateProductKeyFromRequest(StoreProductKeyRequest request)
-        {
-            ProductKey productKey = new ProductKey();
-            productKey.Id = GenerateKeyId(request.Key);
-            productKey.StoreName = request.StoreName;
-            productKey.ProductName = request.ProductName;
-            productKey.Key = request.Key;
-            productKey.Owner = request.Owner;
-            productKey.Comment = request.Comment;
-            productKey.Status = ProductKeyStatus.FromName(request.Status);
-            productKey.AddedDateTime = DateTime.Now;
+                Id = GenerateKeyId(request.Key),
+                StoreName = request.StoreName,
+                ProductName = request.ProductName,
+                Key = request.Key,
+                Owner = request.Owner,
+                Comment = request.Comment,
+                Status = ProductKeyStatus.FromName(request.Status),
+                AddedDateTime = DateTime.Now
+            };
             productKey.UpdatedDateTime = productKey.AddedDateTime;
 
             return productKey;
         }
 
-        ProductKey CreateProductKeyFromRequest(UpdateProductKeyRequest request)
+        static ProductKey CreateProductKeyFromRequest(UpdateProductKeyRequest request) => new()
         {
-            ProductKey productKey = new ProductKey();
-            productKey.Id = GenerateKeyId(request.Key);
-            productKey.StoreName = request.StoreName;
-            productKey.ProductName = request.ProductName;
-            productKey.Key = request.Key;
-            productKey.Owner = request.Owner;
-            productKey.Comment = request.Comment;
-            productKey.Status = ProductKeyStatus.FromName(request.Status);
-
-            return productKey;
-        }
+            Id = GenerateKeyId(request.Key),
+            StoreName = request.StoreName,
+            ProductName = request.ProductName,
+            Key = request.Key,
+            Owner = request.Owner,
+            Comment = request.Comment,
+            Status = ProductKeyStatus.FromName(request.Status)
+        };
     }
 }

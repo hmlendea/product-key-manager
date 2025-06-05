@@ -26,11 +26,11 @@ namespace ProductKeyManager
             dataStoreSettings = new DataStoreSettings();
             securitySettings = new SecuritySettings();
             logSettings = new NuciLoggerSettings();
-            
+
             configuration.Bind(nameof(DataStoreSettings), dataStoreSettings);
             configuration.Bind(nameof(SecuritySettings), securitySettings);
             configuration.Bind(nameof(NuciLoggerSettings), logSettings);
-            
+
             services.AddSingleton(dataStoreSettings);
             services.AddSingleton(securitySettings);
             services.AddSingleton(logSettings);
@@ -38,16 +38,13 @@ namespace ProductKeyManager
             return services;
         }
 
-        public static IServiceCollection AddCustomServices(this IServiceCollection services)
-        {
-            return services
-                .AddSingleton<IRepository<ProductKeyEntity>>(x => new XmlRepository<ProductKeyEntity>(dataStoreSettings.ProductKeysStorePath))
-                .AddSingleton<IHmacEncoder<GetProductKeyRequest>, GetProductKeyRequestHmacEncoder>()
-                .AddSingleton<IHmacEncoder<StoreProductKeyRequest>, StoreProductKeyRequestHmacEncoder>()
-                .AddSingleton<IHmacEncoder<UpdateProductKeyRequest>, UpdateProductKeyRequestHmacEncoder>()
-                .AddSingleton<IHmacEncoder<ProductKeyResponse>, ProductKeyResponseHmacEncoder>()
-                .AddSingleton<IProductKeyService, ProductKeyService>()
-                .AddScoped<ILogger, NuciLogger>();
-        }
+        public static IServiceCollection AddCustomServices(this IServiceCollection services) => services
+            .AddSingleton<IRepository<ProductKeyEntity>>(x => new XmlRepository<ProductKeyEntity>(dataStoreSettings.ProductKeysStorePath))
+            .AddSingleton<IHmacEncoder<GetProductKeyRequest>, GetProductKeyRequestHmacEncoder>()
+            .AddSingleton<IHmacEncoder<StoreProductKeyRequest>, StoreProductKeyRequestHmacEncoder>()
+            .AddSingleton<IHmacEncoder<UpdateProductKeyRequest>, UpdateProductKeyRequestHmacEncoder>()
+            .AddSingleton<IHmacEncoder<ProductKeyResponse>, ProductKeyResponseHmacEncoder>()
+            .AddSingleton<IProductKeyService, ProductKeyService>()
+            .AddScoped<ILogger, NuciLogger>();
     }
 }

@@ -30,7 +30,7 @@ namespace ProductKeyManager.Controllers
         {
             try
             {
-                GetProductKeyRequest request = new GetProductKeyRequest
+                GetProductKeyRequest request = new()
                 {
                     StoreName = store,
                     ProductName = product,
@@ -46,8 +46,7 @@ namespace ProductKeyManager.Controllers
                 }
                 else
                 {
-                    int parsedCount = 1;
-                    int.TryParse(count, out parsedCount);
+                    int.TryParse(count, out int parsedCount);
                     request.Count = Math.Max(1, parsedCount);
                 }
 
@@ -56,7 +55,7 @@ namespace ProductKeyManager.Controllers
             }
             catch (Exception ex)
             {
-                ErrorResponse response = new ErrorResponse(ex);
+                ErrorResponse response = new(ex);
                 return BadRequest(response);
             }
         }
@@ -73,7 +72,7 @@ namespace ProductKeyManager.Controllers
         {
             try
             {
-                StoreProductKeyRequest request = new StoreProductKeyRequest
+                StoreProductKeyRequest request = new()
                 {
                     StoreName = store,
                     ProductName = product,
@@ -90,7 +89,7 @@ namespace ProductKeyManager.Controllers
             }
             catch (Exception ex)
             {
-                ErrorResponse response = new ErrorResponse(ex);
+                ErrorResponse response = new(ex);
                 return BadRequest(response);
             }
         }
@@ -107,7 +106,7 @@ namespace ProductKeyManager.Controllers
         {
             try
             {
-                UpdateProductKeyRequest request = new UpdateProductKeyRequest
+                UpdateProductKeyRequest request = new()
                 {
                     StoreName = store,
                     ProductName = product,
@@ -124,7 +123,7 @@ namespace ProductKeyManager.Controllers
             }
             catch (Exception ex)
             {
-                ErrorResponse response = new ErrorResponse(ex);
+                ErrorResponse response = new(ex);
                 return BadRequest(response);
             }
         }

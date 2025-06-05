@@ -13,72 +13,51 @@ namespace ProductKeyManager.Service.Mapping
     {
         const string DateTimeFormat = "yyyy.MM.ddTHH:mm:ss.ffffzzz";
 
-        internal static ProductKey ToServiceModel(this ProductKeyEntity dataObject)
+        internal static ProductKey ToServiceModel(this ProductKeyEntity dataObject) => new()
         {
-            ProductKey serviceModel = new ProductKey();
-            serviceModel.Id = dataObject.Id;
-            serviceModel.StoreName = dataObject.StoreName;
-            serviceModel.ProductName = dataObject.ProductName;
-            serviceModel.Key = dataObject.Key;
-            serviceModel.Owner = dataObject.Owner;
-            serviceModel.ConfirmationCode = dataObject.ConfirmationCode;
-            serviceModel.Comment = dataObject.Comment;
-            serviceModel.Status = ProductKeyStatus.FromName(dataObject.Status);
-            serviceModel.AddedDateTime = DateTime.ParseExact(dataObject.AddedDateTime, DateTimeFormat, CultureInfo.InvariantCulture);
-            serviceModel.UpdatedDateTime = DateTime.ParseExact(dataObject.UpdatedDateTime, DateTimeFormat, CultureInfo.InvariantCulture);
+            Id = dataObject.Id,
+            StoreName = dataObject.StoreName,
+            ProductName = dataObject.ProductName,
+            Key = dataObject.Key,
+            Owner = dataObject.Owner,
+            ConfirmationCode = dataObject.ConfirmationCode,
+            Comment = dataObject.Comment,
+            Status = ProductKeyStatus.FromName(dataObject.Status),
+            AddedDateTime = DateTime.ParseExact(dataObject.AddedDateTime, DateTimeFormat, CultureInfo.InvariantCulture),
+            UpdatedDateTime = DateTime.ParseExact(dataObject.UpdatedDateTime, DateTimeFormat, CultureInfo.InvariantCulture)
+        };
 
-            return serviceModel;
-        }
-
-        internal static ProductKeyEntity ToDataObject(this ProductKey serviceModel)
+        internal static ProductKeyEntity ToDataObject(this ProductKey serviceModel) => new()
         {
-            ProductKeyEntity dataObject = new ProductKeyEntity();
-            dataObject.Id = serviceModel.Id;
-            dataObject.StoreName = serviceModel.StoreName;
-            dataObject.ProductName = serviceModel.ProductName;
-            dataObject.Key = serviceModel.Key;
-            dataObject.Owner = serviceModel.Owner;
-            dataObject.ConfirmationCode = serviceModel.ConfirmationCode;
-            dataObject.Comment = serviceModel.Comment;
-            dataObject.Status = serviceModel.Status.Name;
-            dataObject.AddedDateTime = serviceModel.AddedDateTime.ToString(DateTimeFormat);
-            dataObject.UpdatedDateTime = serviceModel.UpdatedDateTime.ToString(DateTimeFormat);
+            Id = serviceModel.Id,
+            StoreName = serviceModel.StoreName,
+            ProductName = serviceModel.ProductName,
+            Key = serviceModel.Key,
+            Owner = serviceModel.Owner,
+            ConfirmationCode = serviceModel.ConfirmationCode,
+            Comment = serviceModel.Comment,
+            Status = serviceModel.Status.Name,
+            AddedDateTime = serviceModel.AddedDateTime.ToString(DateTimeFormat),
+            UpdatedDateTime = serviceModel.UpdatedDateTime.ToString(DateTimeFormat)
+        };
 
-            return dataObject;
-        }
-
-        internal static ProductKeyObject ToApiObject(this ProductKey serviceModel)
+        internal static ProductKeyObject ToApiObject(this ProductKey serviceModel) => new()
         {
-            ProductKeyObject apiObject = new ProductKeyObject();
-            apiObject.Store = serviceModel.StoreName;
-            apiObject.Product = serviceModel.ProductName;
-            apiObject.Key = serviceModel.Key;
-            apiObject.Owner = serviceModel.Owner;
-            apiObject.Comment = serviceModel.Comment;
-            apiObject.Status = serviceModel.Status.Name;
-
-            return apiObject;
-        }
+            Store = serviceModel.StoreName,
+            Product = serviceModel.ProductName,
+            Key = serviceModel.Key,
+            Owner = serviceModel.Owner,
+            Comment = serviceModel.Comment,
+            Status = serviceModel.Status.Name
+        };
 
         internal static IEnumerable<ProductKey> ToServiceModels(this IEnumerable<ProductKeyEntity> dataObjects)
-        {
-            IEnumerable<ProductKey> serviceModels = dataObjects.Select(dataObject => dataObject.ToServiceModel());
-
-            return serviceModels;
-        }
+            => dataObjects.Select(dataObject => dataObject.ToServiceModel());
 
         internal static IEnumerable<ProductKeyEntity> ToEntities(this IEnumerable<ProductKey> serviceModels)
-        {
-            IEnumerable<ProductKeyEntity> dataObjects = serviceModels.Select(serviceModel => serviceModel.ToDataObject());
-
-            return dataObjects;
-        }
+            => serviceModels.Select(serviceModel => serviceModel.ToDataObject());
 
         internal static IEnumerable<ProductKeyObject> ToApiObjects(this IEnumerable<ProductKey> serviceModels)
-        {
-            IEnumerable<ProductKeyObject> apiObjects = serviceModels.Select(serviceModel => serviceModel.ToApiObject());
-
-            return apiObjects;
-        }
+            => serviceModels.Select(serviceModel => serviceModel.ToApiObject());
     }
 }

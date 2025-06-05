@@ -6,19 +6,16 @@ namespace ProductKeyManager.Security
 {
     public sealed class StoreProductKeyRequestHmacEncoder : HmacEncoder<StoreProductKeyRequest>
     {
-        public override string GenerateToken(StoreProductKeyRequest obj, string sharedSecretKey)
-        {
-            string stringForSigning =
+        public override string GenerateToken(
+            StoreProductKeyRequest obj,
+            string sharedSecretKey)
+            => ComputeHmacToken(
                 obj.StoreName +
                 obj.ProductName +
                 obj.Key +
                 obj.Owner +
                 obj.Comment +
-                obj.Status;
-
-            string hmacToken = ComputeHmacToken(stringForSigning, sharedSecretKey);
-
-            return hmacToken;
-        }
+                obj.Status,
+                sharedSecretKey);
     }
 }
