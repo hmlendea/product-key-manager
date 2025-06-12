@@ -9,7 +9,7 @@ namespace ProductKeyManager.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class ProductKeyController(IProductKeyService service) : ControllerBase
+    public class ProductKeysController(IProductKeyService service) : ControllerBase
     {
         [HttpGet]
         public ActionResult GetProductKey([FromBody] GetProductKeyRequest request)
