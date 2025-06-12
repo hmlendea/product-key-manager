@@ -23,7 +23,7 @@ namespace ProductKeyManager.Service
     public class ProductKeyService(
         IRepository<ProductKeyEntity> productKeyRepository,
         IHmacEncoder<GetProductKeyRequest> getRequestEncoder,
-        IHmacEncoder<StoreProductKeyRequest> storeRequestEncoder,
+        IHmacEncoder<AddProductKeyRequest> storeRequestEncoder,
         IHmacEncoder<UpdateProductKeyRequest> updateRequestEncoder,
         IHmacEncoder<ProductKeyResponse> productKeyResponseEncoder,
         SecuritySettings securitySettings,
@@ -31,7 +31,7 @@ namespace ProductKeyManager.Service
     {
         readonly IRepository<ProductKeyEntity> productKeyRepository = productKeyRepository;
         readonly IHmacEncoder<GetProductKeyRequest> getRequestEncoder = getRequestEncoder;
-        readonly IHmacEncoder<StoreProductKeyRequest> storeRequestEncoder = storeRequestEncoder;
+        readonly IHmacEncoder<AddProductKeyRequest> storeRequestEncoder = storeRequestEncoder;
         readonly IHmacEncoder<UpdateProductKeyRequest> updateRequestEncoder = updateRequestEncoder;
         readonly IHmacEncoder<ProductKeyResponse> productKeyResponseEncoder = productKeyResponseEncoder;
         readonly SecuritySettings securitySettings = securitySettings;
@@ -73,7 +73,7 @@ namespace ProductKeyManager.Service
             return response;
         }
 
-        public void StoreProductKey(StoreProductKeyRequest request)
+        public void AddProductKey(AddProductKeyRequest request)
         {
             IEnumerable<LogInfo> logInfos =
             [
@@ -85,14 +85,14 @@ namespace ProductKeyManager.Service
                 new(MyLogInfoKey.Comment, request.Comment)
             ];
 
-            logger.Info(MyOperation.StoreProductKey, OperationStatus.Started, logInfos);
+            logger.Info(MyOperation.AddProductKey, OperationStatus.Started, logInfos);
 
             ValidateStoreRequest(request);
 
             ProductKey productKey = CreateProductKeyFromRequest(request);
-            StoreProductKey(productKey);
+            AddProductKey(productKey);
 
-            logger.Debug(MyOperation.StoreProductKey, OperationStatus.Success, logInfos);
+            logger.Debug(MyOperation.AddProductKey, OperationStatus.Success, logInfos);
         }
 
         public void UpdateProductKey(UpdateProductKeyRequest request)
@@ -137,7 +137,7 @@ namespace ProductKeyManager.Service
             throw exception;
         }
 
-        void ValidateStoreRequest(StoreProductKeyRequest request)
+        void ValidateStoreRequest(AddProductKeyRequest request)
         {
             Exception exception;
 
@@ -159,7 +159,7 @@ namespace ProductKeyManager.Service
             }
 
             logger.Error(
-                MyOperation.StoreProductKey,
+                MyOperation.AddProductKey,
                 OperationStatus.Failure,
                 exception,
                 new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
@@ -247,7 +247,7 @@ namespace ProductKeyManager.Service
             return Regex.IsMatch(value, pattern);
         }
 
-        void StoreProductKey(ProductKey productKey)
+        void AddProductKey(ProductKey productKey)
         {
             productKeyRepository.Add(productKey.ToDataObject());
             productKeyRepository.ApplyChanges();
@@ -291,7 +291,7 @@ namespace ProductKeyManager.Service
         static string GenerateKeyId(string key)
             => new Guid(MD5.HashData(Encoding.Default.GetBytes(key))).ToString();
 
-        static ProductKey CreateProductKeyFromRequest(StoreProductKeyRequest request)
+        static ProductKey CreateProductKeyFromRequest(AddProductKeyRequest request)
         {
             ProductKey productKey = new()
             {
