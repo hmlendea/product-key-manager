@@ -3,7 +3,7 @@ using NuciAPI.Requests;
 
 namespace ProductKeyManager.Api.Models
 {
-    public sealed class StoreProductKeyRequest : Request
+    public sealed class AddProductKeyRequest : Request
     {
         [JsonPropertyName("store")]
         public string StoreName { get; set; }

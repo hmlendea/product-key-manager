@@ -4,10 +4,10 @@ using ProductKeyManager.Api.Models;
 
 namespace ProductKeyManager.Security
 {
-    public sealed class StoreProductKeyRequestHmacEncoder : HmacEncoder<StoreProductKeyRequest>
+    public sealed class AddProductKeyRequestHmacEncoder : HmacEncoder<AddProductKeyRequest>
     {
         public override string GenerateToken(
-            StoreProductKeyRequest obj,
+            AddProductKeyRequest obj,
             string sharedSecretKey)
             => ComputeHmacToken(
                 obj.StoreName +

@@ -41,7 +41,7 @@ namespace ProductKeyManager
         public static IServiceCollection AddCustomServices(this IServiceCollection services) => services
             .AddSingleton<IRepository<ProductKeyEntity>>(x => new XmlRepository<ProductKeyEntity>(dataStoreSettings.ProductKeysStorePath))
             .AddSingleton<IHmacEncoder<GetProductKeyRequest>, GetProductKeyRequestHmacEncoder>()
-            .AddSingleton<IHmacEncoder<StoreProductKeyRequest>, StoreProductKeyRequestHmacEncoder>()
+            .AddSingleton<IHmacEncoder<AddProductKeyRequest>, AddProductKeyRequestHmacEncoder>()
             .AddSingleton<IHmacEncoder<UpdateProductKeyRequest>, UpdateProductKeyRequestHmacEncoder>()
             .AddSingleton<IHmacEncoder<ProductKeyResponse>, ProductKeyResponseHmacEncoder>()
             .AddSingleton<IProductKeyService, ProductKeyService>()

@@ -9,7 +9,7 @@ namespace ProductKeyManager.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class ProductKeysController(IProductKeyService service) : ControllerBase
+    public class ProductKeyController(IProductKeyService service) : ControllerBase
     {
         [HttpGet]
         public ActionResult GetProductKey([FromBody] GetProductKeyRequest request)
@@ -30,7 +30,7 @@ namespace ProductKeyManager.Api.Controllers
         }
 
         [HttpPost]
-        public ActionResult StoreProductKey([FromBody] StoreProductKeyRequest request)
+        public ActionResult AddProductKey([FromBody] AddProductKeyRequest request)
         {
             if (request is null)
             {
@@ -39,7 +39,7 @@ namespace ProductKeyManager.Api.Controllers
 
             try
             {
-                service.StoreProductKey(request);
+                service.AddProductKey(request);
 
                 return Ok(SuccessResponse.Default);
             }
