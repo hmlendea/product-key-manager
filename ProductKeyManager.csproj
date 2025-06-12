@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="NuciAPI" Version="1.0.0" />
     <PackageReference Include="NuciDAL" Version="2.2.0" />
     <PackageReference Include="NuciExtensions" Version="5.0.0" />
     <PackageReference Include="NuciLog" Version="1.1.0.1" />

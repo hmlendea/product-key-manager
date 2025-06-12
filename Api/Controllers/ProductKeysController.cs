@@ -1,95 +1,71 @@
 using System;
 
 using Microsoft.AspNetCore.Mvc;
-
+using NuciAPI.Responses;
 using ProductKeyManager.Api.Models;
 using ProductKeyManager.Service;
 
 namespace ProductKeyManager.Api.Controllers
 {
-    [Route("[controller]")]
     [ApiController]
+    [Route("[controller]")]
     public class ProductKeysController(IProductKeyService service) : ControllerBase
     {
-        readonly IProductKeyService service = service;
-
         [HttpGet]
-        public ActionResult GetProductKey([FromQuery] ProductKeyQuery query)
+        public ActionResult GetProductKey([FromBody] GetProductKeyRequest request)
         {
+            if (request is null)
+            {
+                return BadRequest(ErrorResponse.InvalidRequest);
+            }
+
             try
             {
-                GetProductKeyRequest request = new()
-                {
-                    StoreName = query.Store,
-                    ProductName = query.Product,
-                    Key = query.Key,
-                    Owner = query.Owner,
-                    Status = query.Status,
-                    Count = query.Count ?? 1,
-                    HmacToken = query.Hmac
-                };
-
-                ProductKeyResponse response = service.GetProductKey(request);
-                return Ok(response);
+                return Ok(service.GetProductKey(request));
             }
             catch (Exception ex)
             {
-                ErrorResponse response = new(ex);
-                return BadRequest(response);
+                return BadRequest(ErrorResponse.FromException(ex));
             }
         }
 
         [HttpPost]
-        public ActionResult StoreProductKey([FromQuery] ProductKeyQuery query)
+        public ActionResult StoreProductKey([FromBody] StoreProductKeyRequest request)
         {
+            if (request is null)
+            {
+                return BadRequest(ErrorResponse.InvalidRequest);
+            }
+
             try
             {
-                StoreProductKeyRequest request = new()
-                {
-                    StoreName = query.Store,
-                    ProductName = query.Product,
-                    Key = query.Key,
-                    Owner = query.Owner,
-                    Comment = query.Comment,
-                    Status = query.Status,
-                    HmacToken = query.Hmac
-                };
-
                 service.StoreProductKey(request);
 
-                return Ok();
+                return Ok(SuccessResponse.Default);
             }
             catch (Exception ex)
             {
-                ErrorResponse response = new(ex);
-                return BadRequest(response);
+                return BadRequest(ErrorResponse.FromException(ex));
             }
         }
 
         [HttpPut]
-        public ActionResult UpdateProductKey([FromQuery] ProductKeyQuery query)
+        public ActionResult UpdateProductKey([FromBody] UpdateProductKeyRequest request)
         {
+            if (request is null)
+            {
+                return BadRequest(ErrorResponse.InvalidRequest);
+            }
+
             try
             {
-                UpdateProductKeyRequest request = new()
-                {
-                    StoreName = query.Store,
-                    ProductName = query.Product,
-                    Key = query.Key,
-                    Owner = query.Owner,
-                    Comment = query.Comment,
-                    Status = query.Status,
-                    HmacToken = query.Hmac
-                };
-
                 service.UpdateProductKey(request);
 
-                return Ok();
+                return Ok(SuccessResponse.Default);
             }
             catch (Exception ex)
             {
-                ErrorResponse response = new(ex);
-                return BadRequest(response);
+                return BadRequest(ErrorResponse.FromException(ex));
             }
         }
     }
