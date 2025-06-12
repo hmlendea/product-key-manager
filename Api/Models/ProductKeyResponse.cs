@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using NuciAPI.Responses;
 
 namespace ProductKeyManager.Api.Models
 {
@@ -10,13 +11,9 @@ namespace ProductKeyManager.Api.Models
         public int Count => ProductKeys.Count();
 
         public ProductKeyResponse(ProductKeyObject productKey)
-        {
-            ProductKeys = [productKey];
-        }
+            => ProductKeys = [productKey];
 
         public ProductKeyResponse(IEnumerable<ProductKeyObject> productKeys)
-        {
-            ProductKeys = productKeys;
-        }
+            => ProductKeys = productKeys;
     }
 }
