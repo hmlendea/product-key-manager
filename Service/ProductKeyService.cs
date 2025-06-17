@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security;
-using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -26,10 +25,6 @@ namespace ProductKeyManager.Service
         SecuritySettings securitySettings,
         ILogger logger) : IProductKeyService
     {
-        readonly IRepository<ProductKeyEntity> productKeyRepository = productKeyRepository;
-        readonly SecuritySettings securitySettings = securitySettings;
-        readonly ILogger logger = logger;
-
         public ProductKeyResponse GetProductKey(GetProductKeyRequest request)
         {
             IEnumerable<LogInfo> logInfos =
@@ -189,23 +184,21 @@ namespace ProductKeyManager.Service
 
         IEnumerable<ProductKey> FindProductKeys(GetProductKeyRequest request, int count)
         {
-            IEnumerable<ProductKeyEntity> productKeyCandidates = productKeyRepository
+            IList<ProductKeyEntity> shuffledCandidates = productKeyRepository
                 .GetAll()
                 .Where(x =>
                     DoesPropertyMatchFilter(x.StoreName, request.StoreName) &&
                     DoesPropertyMatchFilter(x.ProductName, request.ProductName) &&
                     DoesPropertyMatchFilter(x.Key, request.Key) &&
                     DoesPropertyMatchFilter(x.Owner, request.Owner) &&
-                    DoesPropertyMatchFilter(x.Status, request.Status));
+                    DoesPropertyMatchFilter(x.Status, request.Status))
+                .Distinct()
+                .ToList()
+                .Shuffle();
 
-            IList<ProductKeyEntity> shuffledCandidates = productKeyCandidates.Distinct().ToList().Shuffle();
-
-            if (count > shuffledCandidates.Count)
-            {
-                count = shuffledCandidates.Count;
-            }
-
-            return shuffledCandidates.ToServiceModels().Take(count);
+            return shuffledCandidates
+                .ToServiceModels()
+                .Take(Math.Min(count, shuffledCandidates.Count));
         }
 
         static bool DoesPropertyMatchFilter(string value, string filterValue)
