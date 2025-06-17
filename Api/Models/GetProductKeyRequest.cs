@@ -16,15 +16,19 @@ namespace ProductKeyManager.Api.Models
         public string ProductName { get; set; }
 
         [HmacOrder(3)]
+        [JsonPropertyName("key")]
         public string Key { get; set; }
 
         [HmacOrder(4)]
+        [JsonPropertyName("owner")]
         public string Owner { get; set; }
 
         [HmacOrder(5)]
+        [JsonPropertyName("status")]
         public string Status { get; set; }
 
         [HmacOrder(6)]
+        [JsonPropertyName("count")]
         [Range(1, 1000, ErrorMessage = "Count must be between 1 and 1000.")]
         public int Count { get; set; } = 1;
     }
