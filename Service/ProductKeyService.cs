@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security;
 using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Text;
@@ -111,86 +112,76 @@ namespace ProductKeyManager.Service
 
         void ValidateGetRequest(GetProductKeyRequest request)
         {
-            if (HmacEncoder.IsTokenValid(request.HmacToken, request, securitySettings.SharedSecretKey))
+            try
             {
-                return;
+                HmacValidator.Validate(request.HmacToken, request, securitySettings.SharedSecretKey);
             }
+            catch (SecurityException ex)
+            {
+                logger.Error(
+                    MyOperation.GetProductKey,
+                    OperationStatus.Failure,
+                    ex,
+                    new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
+                    new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
+                    new LogInfo(MyLogInfoKey.Key, request.Key));
 
-            AuthenticationException exception = new("The provided HMAC token is not valid");
-
-            logger.Error(
-                MyOperation.GetProductKey,
-                OperationStatus.Failure,
-                exception,
-                new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
-                new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
-                new LogInfo(MyLogInfoKey.Key, request.Key));
-
-            throw exception;
+                throw;
+            }
         }
 
         void ValidateStoreRequest(AddProductKeyRequest request)
         {
-            Exception exception;
+            try
+            {
+                HmacValidator.Validate(request.HmacToken, request, securitySettings.SharedSecretKey);
 
-            if (!HmacEncoder.IsTokenValid(request.HmacToken, request, securitySettings.SharedSecretKey))
-            {
-                exception = new AuthenticationException("The provided HMAC token is not valid");
-            }
-            else if (string.IsNullOrWhiteSpace(request.Key))
-            {
-                exception = new ArgumentNullException("key");
-            }
-            else if (DoesKeyExistInStore(request.Key))
-            {
-                exception = new ArgumentException("The specified product key already exists");
-            }
-            else
-            {
-                return;
-            }
+                ArgumentNullException.ThrowIfNullOrWhiteSpace(request.Key);
 
-            logger.Error(
-                MyOperation.AddProductKey,
-                OperationStatus.Failure,
-                exception,
-                new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
-                new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
-                new LogInfo(MyLogInfoKey.Key, request.Key));
+                if (DoesKeyExistInStore(request.Key))
+                {
+                    throw new ArgumentException("The specified product key already exists");
+                }
+            }
+            catch (SecurityException ex)
+            {
+                logger.Error(
+                    MyOperation.AddProductKey,
+                    OperationStatus.Failure,
+                    ex,
+                    new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
+                    new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
+                    new LogInfo(MyLogInfoKey.Key, request.Key));
 
-            throw exception;
+                throw;
+            }
         }
 
         void ValidateUpdateRequest(UpdateProductKeyRequest request)
         {
-            Exception exception;
+            try
+            {
+                HmacValidator.Validate(request.HmacToken, request, securitySettings.SharedSecretKey);
 
-            if (!HmacEncoder.IsTokenValid(request.HmacToken, request, securitySettings.SharedSecretKey))
-            {
-                exception = new AuthenticationException("The provided HMAC token is not valid");
-            }
-            else if (string.IsNullOrWhiteSpace(request.Key))
-            {
-                exception = new ArgumentNullException("key");
-            }
-            else if (!DoesKeyExistInStore(request.Key))
-            {
-                exception = new ArgumentException("The specified product key does not exist");
-            }
-            else
-            {
-                return;
-            }
+                ArgumentNullException.ThrowIfNullOrWhiteSpace(request.Key);
 
-            logger.Error(
-                MyOperation.UpdateProductKey,
-                OperationStatus.Failure,
-                exception,
-                new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
-                new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
-                new LogInfo(MyLogInfoKey.Key, request.Key));
+                if (DoesKeyExistInStore(request.Key))
+                {
+                    throw new ArgumentException("The specified product key already exists");
+                }
+            }
+            catch (SecurityException ex)
+            {
+                logger.Error(
+                    MyOperation.UpdateProductKey,
+                    OperationStatus.Failure,
+                    ex,
+                    new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
+                    new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
+                    new LogInfo(MyLogInfoKey.Key, request.Key));
 
-            throw exception;
+                throw;
+            }
         }
 
         bool DoesKeyExistInStore(string key)
