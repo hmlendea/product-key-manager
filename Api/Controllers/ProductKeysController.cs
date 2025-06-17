@@ -25,7 +25,7 @@ namespace ProductKeyManager.Api.Controllers
             }
             catch (SecurityException ex)
             {
-                return Unauthorized(ex.Message);
+                return Unauthorized(ErrorResponse.FromException(ex));
             }
             catch (Exception ex)
             {
@@ -49,7 +49,7 @@ namespace ProductKeyManager.Api.Controllers
             }
             catch (SecurityException ex)
             {
-                return Unauthorized(ex.Message);
+                return Unauthorized(ErrorResponse.FromException(ex));
             }
             catch (Exception ex)
             {
@@ -73,7 +73,7 @@ namespace ProductKeyManager.Api.Controllers
             }
             catch (SecurityException ex)
             {
-                return Unauthorized(ex.Message);
+                return Unauthorized(ErrorResponse.FromException(ex));
             }
             catch (Exception ex)
             {
