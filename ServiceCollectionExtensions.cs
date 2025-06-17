@@ -10,7 +10,6 @@ using NuciSecurity.HMAC;
 using ProductKeyManager.Api.Models;
 using ProductKeyManager.Configuration;
 using ProductKeyManager.DataAccess.DataObjects;
-using ProductKeyManager.Security;
 using ProductKeyManager.Service;
 
 namespace ProductKeyManager
@@ -40,10 +39,6 @@ namespace ProductKeyManager
 
         public static IServiceCollection AddCustomServices(this IServiceCollection services) => services
             .AddSingleton<IRepository<ProductKeyEntity>>(x => new XmlRepository<ProductKeyEntity>(dataStoreSettings.ProductKeysStorePath))
-            .AddSingleton<IHmacEncoder<GetProductKeyRequest>, GetProductKeyRequestHmacEncoder>()
-            .AddSingleton<IHmacEncoder<AddProductKeyRequest>, AddProductKeyRequestHmacEncoder>()
-            .AddSingleton<IHmacEncoder<UpdateProductKeyRequest>, UpdateProductKeyRequestHmacEncoder>()
-            .AddSingleton<IHmacEncoder<ProductKeyResponse>, ProductKeyResponseHmacEncoder>()
             .AddSingleton<IProductKeyService, ProductKeyService>()
             .AddScoped<ILogger, NuciLogger>();
     }

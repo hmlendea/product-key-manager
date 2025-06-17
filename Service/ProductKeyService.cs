@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Authentication;
+using System.Security;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -22,21 +22,9 @@ namespace ProductKeyManager.Service
 {
     public class ProductKeyService(
         IRepository<ProductKeyEntity> productKeyRepository,
-        IHmacEncoder<GetProductKeyRequest> getRequestEncoder,
-        IHmacEncoder<AddProductKeyRequest> storeRequestEncoder,
-        IHmacEncoder<UpdateProductKeyRequest> updateRequestEncoder,
-        IHmacEncoder<ProductKeyResponse> productKeyResponseEncoder,
         SecuritySettings securitySettings,
         ILogger logger) : IProductKeyService
     {
-        readonly IRepository<ProductKeyEntity> productKeyRepository = productKeyRepository;
-        readonly IHmacEncoder<GetProductKeyRequest> getRequestEncoder = getRequestEncoder;
-        readonly IHmacEncoder<AddProductKeyRequest> storeRequestEncoder = storeRequestEncoder;
-        readonly IHmacEncoder<UpdateProductKeyRequest> updateRequestEncoder = updateRequestEncoder;
-        readonly IHmacEncoder<ProductKeyResponse> productKeyResponseEncoder = productKeyResponseEncoder;
-        readonly SecuritySettings securitySettings = securitySettings;
-        readonly ILogger logger = logger;
-
         public ProductKeyResponse GetProductKey(GetProductKeyRequest request)
         {
             IEnumerable<LogInfo> logInfos =
@@ -66,7 +54,7 @@ namespace ProductKeyManager.Service
             }
 
             ProductKeyResponse response = new(productKeys.ToApiObjects());
-            response.HmacToken = productKeyResponseEncoder.GenerateToken(response, securitySettings.SharedSecretKey);
+            response.HmacToken = HmacEncoder.GenerateToken(response, securitySettings.SharedSecretKey);
 
             logger.Info(MyOperation.GetProductKey, OperationStatus.Success, logInfos);
 
@@ -119,86 +107,76 @@ namespace ProductKeyManager.Service
 
         void ValidateGetRequest(GetProductKeyRequest request)
         {
-            if (getRequestEncoder.IsTokenValid(request.HmacToken, request, securitySettings.SharedSecretKey))
+            try
             {
-                return;
+                HmacValidator.Validate(request.HmacToken, request, securitySettings.SharedSecretKey);
             }
+            catch (SecurityException ex)
+            {
+                logger.Error(
+                    MyOperation.GetProductKey,
+                    OperationStatus.Failure,
+                    ex,
+                    new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
+                    new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
+                    new LogInfo(MyLogInfoKey.Key, request.Key));
 
-            AuthenticationException exception = new("The provided HMAC token is not valid");
-
-            logger.Error(
-                MyOperation.GetProductKey,
-                OperationStatus.Failure,
-                exception,
-                new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
-                new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
-                new LogInfo(MyLogInfoKey.Key, request.Key));
-
-            throw exception;
+                throw;
+            }
         }
 
         void ValidateStoreRequest(AddProductKeyRequest request)
         {
-            Exception exception;
+            try
+            {
+                HmacValidator.Validate(request.HmacToken, request, securitySettings.SharedSecretKey);
 
-            if (!storeRequestEncoder.IsTokenValid(request.HmacToken, request, securitySettings.SharedSecretKey))
-            {
-                exception = new AuthenticationException("The provided HMAC token is not valid");
-            }
-            else if (string.IsNullOrWhiteSpace(request.Key))
-            {
-                exception = new ArgumentNullException("key");
-            }
-            else if (DoesKeyExistInStore(request.Key))
-            {
-                exception = new ArgumentException("The specified product key already exists");
-            }
-            else
-            {
-                return;
-            }
+                ArgumentNullException.ThrowIfNullOrWhiteSpace(request.Key);
 
-            logger.Error(
-                MyOperation.AddProductKey,
-                OperationStatus.Failure,
-                exception,
-                new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
-                new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
-                new LogInfo(MyLogInfoKey.Key, request.Key));
+                if (DoesKeyExistInStore(request.Key))
+                {
+                    throw new ArgumentException("The specified product key already exists");
+                }
+            }
+            catch (SecurityException ex)
+            {
+                logger.Error(
+                    MyOperation.AddProductKey,
+                    OperationStatus.Failure,
+                    ex,
+                    new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
+                    new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
+                    new LogInfo(MyLogInfoKey.Key, request.Key));
 
-            throw exception;
+                throw;
+            }
         }
 
         void ValidateUpdateRequest(UpdateProductKeyRequest request)
         {
-            Exception exception;
+            try
+            {
+                HmacValidator.Validate(request.HmacToken, request, securitySettings.SharedSecretKey);
 
-            if (!updateRequestEncoder.IsTokenValid(request.HmacToken, request, securitySettings.SharedSecretKey))
-            {
-                exception = new AuthenticationException("The provided HMAC token is not valid");
-            }
-            else if (string.IsNullOrWhiteSpace(request.Key))
-            {
-                exception = new ArgumentNullException("key");
-            }
-            else if (!DoesKeyExistInStore(request.Key))
-            {
-                exception = new ArgumentException("The specified product key does not exist");
-            }
-            else
-            {
-                return;
-            }
+                ArgumentNullException.ThrowIfNullOrWhiteSpace(request.Key);
 
-            logger.Error(
-                MyOperation.UpdateProductKey,
-                OperationStatus.Failure,
-                exception,
-                new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
-                new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
-                new LogInfo(MyLogInfoKey.Key, request.Key));
+                if (DoesKeyExistInStore(request.Key))
+                {
+                    throw new ArgumentException("The specified product key already exists");
+                }
+            }
+            catch (SecurityException ex)
+            {
+                logger.Error(
+                    MyOperation.UpdateProductKey,
+                    OperationStatus.Failure,
+                    ex,
+                    new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
+                    new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
+                    new LogInfo(MyLogInfoKey.Key, request.Key));
 
-            throw exception;
+                throw;
+            }
         }
 
         bool DoesKeyExistInStore(string key)
@@ -206,23 +184,21 @@ namespace ProductKeyManager.Service
 
         IEnumerable<ProductKey> FindProductKeys(GetProductKeyRequest request, int count)
         {
-            IEnumerable<ProductKeyEntity> productKeyCandidates = productKeyRepository
+            IList<ProductKeyEntity> shuffledCandidates = productKeyRepository
                 .GetAll()
                 .Where(x =>
                     DoesPropertyMatchFilter(x.StoreName, request.StoreName) &&
                     DoesPropertyMatchFilter(x.ProductName, request.ProductName) &&
                     DoesPropertyMatchFilter(x.Key, request.Key) &&
                     DoesPropertyMatchFilter(x.Owner, request.Owner) &&
-                    DoesPropertyMatchFilter(x.Status, request.Status));
+                    DoesPropertyMatchFilter(x.Status, request.Status))
+                .Distinct()
+                .ToList()
+                .Shuffle();
 
-            IList<ProductKeyEntity> shuffledCandidates = productKeyCandidates.Distinct().ToList().Shuffle();
-
-            if (count > shuffledCandidates.Count)
-            {
-                count = shuffledCandidates.Count;
-            }
-
-            return shuffledCandidates.ToServiceModels().Take(count);
+            return shuffledCandidates
+                .ToServiceModels()
+                .Take(Math.Min(count, shuffledCandidates.Count));
         }
 
         static bool DoesPropertyMatchFilter(string value, string filterValue)
