@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NuciAPI.Responses;
+using NuciSecurity.HMAC;
 
 namespace ProductKeyManager.Api.Models
 {
@@ -8,6 +9,7 @@ namespace ProductKeyManager.Api.Models
     {
         public IEnumerable<ProductKeyObject> ProductKeys { get; set; }
 
+        [HmacIgnore]
         public int Count => ProductKeys.Count();
 
         public ProductKeyResponse(ProductKeyObject productKey)
