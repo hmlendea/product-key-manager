@@ -22,18 +22,10 @@ namespace ProductKeyManager.Service
 {
     public class ProductKeyService(
         IRepository<ProductKeyEntity> productKeyRepository,
-        IHmacEncoder<GetProductKeyRequest> getRequestEncoder,
-        IHmacEncoder<AddProductKeyRequest> storeRequestEncoder,
-        IHmacEncoder<UpdateProductKeyRequest> updateRequestEncoder,
-        IHmacEncoder<ProductKeyResponse> productKeyResponseEncoder,
         SecuritySettings securitySettings,
         ILogger logger) : IProductKeyService
     {
         readonly IRepository<ProductKeyEntity> productKeyRepository = productKeyRepository;
-        readonly IHmacEncoder<GetProductKeyRequest> getRequestEncoder = getRequestEncoder;
-        readonly IHmacEncoder<AddProductKeyRequest> storeRequestEncoder = storeRequestEncoder;
-        readonly IHmacEncoder<UpdateProductKeyRequest> updateRequestEncoder = updateRequestEncoder;
-        readonly IHmacEncoder<ProductKeyResponse> productKeyResponseEncoder = productKeyResponseEncoder;
         readonly SecuritySettings securitySettings = securitySettings;
         readonly ILogger logger = logger;
 
@@ -66,7 +58,7 @@ namespace ProductKeyManager.Service
             }
 
             ProductKeyResponse response = new(productKeys.ToApiObjects());
-            response.HmacToken = productKeyResponseEncoder.GenerateToken(response, securitySettings.SharedSecretKey);
+            response.HmacToken = HmacEncoder.GenerateToken(response, securitySettings.SharedSecretKey);
 
             logger.Info(MyOperation.GetProductKey, OperationStatus.Success, logInfos);
 
@@ -119,7 +111,7 @@ namespace ProductKeyManager.Service
 
         void ValidateGetRequest(GetProductKeyRequest request)
         {
-            if (getRequestEncoder.IsTokenValid(request.HmacToken, request, securitySettings.SharedSecretKey))
+            if (HmacEncoder.IsTokenValid(request.HmacToken, request, securitySettings.SharedSecretKey))
             {
                 return;
             }
@@ -141,7 +133,7 @@ namespace ProductKeyManager.Service
         {
             Exception exception;
 
-            if (!storeRequestEncoder.IsTokenValid(request.HmacToken, request, securitySettings.SharedSecretKey))
+            if (!HmacEncoder.IsTokenValid(request.HmacToken, request, securitySettings.SharedSecretKey))
             {
                 exception = new AuthenticationException("The provided HMAC token is not valid");
             }
@@ -173,7 +165,7 @@ namespace ProductKeyManager.Service
         {
             Exception exception;
 
-            if (!updateRequestEncoder.IsTokenValid(request.HmacToken, request, securitySettings.SharedSecretKey))
+            if (!HmacEncoder.IsTokenValid(request.HmacToken, request, securitySettings.SharedSecretKey))
             {
                 exception = new AuthenticationException("The provided HMAC token is not valid");
             }
