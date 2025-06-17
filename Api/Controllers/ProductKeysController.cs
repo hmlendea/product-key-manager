@@ -1,5 +1,5 @@
 using System;
-
+using System.Security;
 using Microsoft.AspNetCore.Mvc;
 using NuciAPI.Responses;
 using ProductKeyManager.Api.Models;
@@ -23,6 +23,10 @@ namespace ProductKeyManager.Api.Controllers
             {
                 return Ok(service.GetProductKey(request));
             }
+            catch (SecurityException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
             catch (Exception ex)
             {
                 return BadRequest(ErrorResponse.FromException(ex));
@@ -43,6 +47,10 @@ namespace ProductKeyManager.Api.Controllers
 
                 return Ok(SuccessResponse.Default);
             }
+            catch (SecurityException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
             catch (Exception ex)
             {
                 return BadRequest(ErrorResponse.FromException(ex));
@@ -62,6 +70,10 @@ namespace ProductKeyManager.Api.Controllers
                 service.UpdateProductKey(request);
 
                 return Ok(SuccessResponse.Default);
+            }
+            catch (SecurityException ex)
+            {
+                return Unauthorized(ex.Message);
             }
             catch (Exception ex)
             {
