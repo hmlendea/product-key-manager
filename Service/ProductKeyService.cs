@@ -21,7 +21,7 @@ using ProductKeyManager.Service.Models;
 namespace ProductKeyManager.Service
 {
     public class ProductKeyService(
-        IRepository<ProductKeyEntity> productKeyRepository,
+        IFileRepository<ProductKeyEntity> productKeyRepository,
         SecuritySettings securitySettings,
         ILogger logger) : IProductKeyService
     {

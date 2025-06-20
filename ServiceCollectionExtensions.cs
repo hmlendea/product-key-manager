@@ -38,7 +38,7 @@ namespace ProductKeyManager
         }
 
         public static IServiceCollection AddCustomServices(this IServiceCollection services) => services
-            .AddSingleton<IRepository<ProductKeyEntity>>(x => new XmlRepository<ProductKeyEntity>(dataStoreSettings.ProductKeysStorePath))
+            .AddSingleton<IFileRepository<ProductKeyEntity>>(x => new XmlRepository<ProductKeyEntity>(dataStoreSettings.ProductKeysStorePath))
             .AddSingleton<IProductKeyService, ProductKeyService>()
             .AddScoped<ILogger, NuciLogger>();
     }
