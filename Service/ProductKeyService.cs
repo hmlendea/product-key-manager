@@ -45,7 +45,7 @@ namespace ProductKeyManager.Service
                 .OrderBy(x => x.ProductName)
                 .ThenBy(x => x.Key);
 
-            if (productKeys?.Count() == 0)
+            if (EnumerableExt.IsNullOrEmpty(productKeys))
             {
                 Exception ex = new NullReferenceException("No key found for the given filters");
                 logger.Info(MyOperation.GetProductKey, OperationStatus.Failure, ex, logInfos);
@@ -215,7 +215,7 @@ namespace ProductKeyManager.Service
 
             string pattern = filterValue;
 
-            if (pattern[0] != '^' && pattern[pattern.Length - 1] != '$')
+            if (pattern[0].NotEquals('^') && pattern[^1].NotEquals('$'))
             {
                 pattern = $"^{pattern}$";
             }
@@ -253,7 +253,7 @@ namespace ProductKeyManager.Service
                 productKeyToUpdate.Comment = productKey.Comment;
             }
 
-            if (productKey.Status != ProductKeyStatus.Unknown)
+            if (productKey.Status.NotEquals(ProductKeyStatus.Unknown))
             {
                 productKeyToUpdate.Status = productKey.Status;
             }
