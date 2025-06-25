@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NuciExtensions;
 
 namespace ProductKeyManager.Service.Models
 {
@@ -45,7 +46,7 @@ namespace ProductKeyManager.Service.Models
 
         public bool Equals(ProductKeyStatus other)
         {
-            if (ReferenceEquals(null, other))
+            if (other is null)
             {
                 return false;
             }
@@ -60,7 +61,7 @@ namespace ProductKeyManager.Service.Models
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj))
+            if (obj is null)
             {
                 return false;
             }
@@ -70,7 +71,7 @@ namespace ProductKeyManager.Service.Models
                 return true;
             }
 
-            if (obj.GetType() != GetType())
+            if (obj.GetType().NotEquals(GetType()))
             {
                 return false;
             }
@@ -82,22 +83,20 @@ namespace ProductKeyManager.Service.Models
         {
             if (first is null)
             {
-                return (second is null);
+                return second is null;
             }
 
             return first.Equals(second);
         }
 
         public static bool operator != (ProductKeyStatus first, ProductKeyStatus second)
-        {
-            return !(first == second);
-        }
+            => !(first == second);
 
         public override int GetHashCode()
         {
             unchecked
             {
-                return (Name != null ? Name.GetHashCode() : 0) * 397;
+                return (Name is not null ? Name.GetHashCode() : 0) * 397;
             }
         }
     }
