@@ -4,7 +4,7 @@ using NuciSecurity.HMAC;
 
 namespace ProductKeyManager.Api.Models
 {
-    public sealed class AddProductKeyRequest : Request
+    public sealed class AddProductKeyRequest : NuciApiRequest
     {
         [HmacOrder(1)]
         [JsonPropertyName("store")]
