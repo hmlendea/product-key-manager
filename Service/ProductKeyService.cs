@@ -132,11 +132,6 @@ namespace ProductKeyManager.Service
                 request.ValidateHMAC(securitySettings.SharedSecretKey);
 
                 ArgumentNullException.ThrowIfNullOrWhiteSpace(request.Key);
-
-                if (DoesKeyExistInStore(request.Key))
-                {
-                    throw new ArgumentException("The specified product key already exists");
-                }
             }
             catch (SecurityException ex)
             {
@@ -159,11 +154,6 @@ namespace ProductKeyManager.Service
                 request.ValidateHMAC(securitySettings.SharedSecretKey);
 
                 ArgumentNullException.ThrowIfNullOrWhiteSpace(request.Key);
-
-                if (DoesKeyExistInStore(request.Key))
-                {
-                    throw new ArgumentException("The specified product key already exists");
-                }
             }
             catch (SecurityException ex)
             {
@@ -178,9 +168,6 @@ namespace ProductKeyManager.Service
                 throw;
             }
         }
-
-        bool DoesKeyExistInStore(string key)
-            => productKeyRepository.TryGet(GenerateKeyId(key)) is not null;
 
         IEnumerable<ProductKey> FindProductKeys(GetProductKeyRequest request, int count)
         {
