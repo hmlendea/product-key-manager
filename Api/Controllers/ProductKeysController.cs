@@ -16,7 +16,7 @@ namespace ProductKeyManager.Api.Controllers
         {
             if (request is null)
             {
-                return BadRequest(ErrorResponse.InvalidRequest);
+                return BadRequest(NuciApiErrorResponse.InvalidRequest);
             }
 
             try
@@ -25,11 +25,11 @@ namespace ProductKeyManager.Api.Controllers
             }
             catch (SecurityException ex)
             {
-                return Unauthorized(ErrorResponse.FromException(ex));
+                return Unauthorized(NuciApiErrorResponse.FromException(ex));
             }
             catch (Exception ex)
             {
-                return BadRequest(ErrorResponse.FromException(ex));
+                return BadRequest(NuciApiErrorResponse.FromException(ex));
             }
         }
 
@@ -38,22 +38,22 @@ namespace ProductKeyManager.Api.Controllers
         {
             if (request is null)
             {
-                return BadRequest(ErrorResponse.InvalidRequest);
+                return BadRequest(NuciApiErrorResponse.InvalidRequest);
             }
 
             try
             {
                 service.AddProductKey(request);
 
-                return Ok(SuccessResponse.Default);
+                return Ok(NuciApiSuccessResponse.Default);
             }
             catch (SecurityException ex)
             {
-                return Unauthorized(ErrorResponse.FromException(ex));
+                return Unauthorized(NuciApiErrorResponse.FromException(ex));
             }
             catch (Exception ex)
             {
-                return BadRequest(ErrorResponse.FromException(ex));
+                return BadRequest(NuciApiErrorResponse.FromException(ex));
             }
         }
 
@@ -62,22 +62,22 @@ namespace ProductKeyManager.Api.Controllers
         {
             if (request is null)
             {
-                return BadRequest(ErrorResponse.InvalidRequest);
+                return BadRequest(NuciApiErrorResponse.InvalidRequest);
             }
 
             try
             {
                 service.UpdateProductKey(request);
 
-                return Ok(SuccessResponse.Default);
+                return Ok(NuciApiSuccessResponse.Default);
             }
             catch (SecurityException ex)
             {
-                return Unauthorized(ErrorResponse.FromException(ex));
+                return Unauthorized(NuciApiErrorResponse.FromException(ex));
             }
             catch (Exception ex)
             {
-                return BadRequest(ErrorResponse.FromException(ex));
+                return BadRequest(NuciApiErrorResponse.FromException(ex));
             }
         }
     }

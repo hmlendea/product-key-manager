@@ -54,7 +54,7 @@ namespace ProductKeyManager.Service
             }
 
             ProductKeyResponse response = new(productKeys.ToApiObjects());
-            response.HmacToken = HmacEncoder.GenerateToken(response, securitySettings.SharedSecretKey);
+            response.SignHMAC(securitySettings.SharedSecretKey);
 
             logger.Info(MyOperation.GetProductKey, OperationStatus.Success, logInfos);
 
@@ -109,7 +109,7 @@ namespace ProductKeyManager.Service
         {
             try
             {
-                HmacValidator.Validate(request.HmacToken, request, securitySettings.SharedSecretKey);
+                request.ValidateHMAC(securitySettings.SharedSecretKey);
             }
             catch (SecurityException ex)
             {
@@ -129,7 +129,7 @@ namespace ProductKeyManager.Service
         {
             try
             {
-                HmacValidator.Validate(request.HmacToken, request, securitySettings.SharedSecretKey);
+                request.ValidateHMAC(securitySettings.SharedSecretKey);
 
                 ArgumentNullException.ThrowIfNullOrWhiteSpace(request.Key);
 
@@ -156,7 +156,7 @@ namespace ProductKeyManager.Service
         {
             try
             {
-                HmacValidator.Validate(request.HmacToken, request, securitySettings.SharedSecretKey);
+                request.ValidateHMAC(securitySettings.SharedSecretKey);
 
                 ArgumentNullException.ThrowIfNullOrWhiteSpace(request.Key);
 
