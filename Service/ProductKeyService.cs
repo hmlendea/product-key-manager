@@ -9,7 +9,6 @@ using System.Text.RegularExpressions;
 using NuciDAL.Repositories;
 using NuciExtensions;
 using NuciLog.Core;
-using NuciSecurity.HMAC;
 
 using ProductKeyManager.Api.Models;
 using ProductKeyManager.Configuration;
@@ -38,8 +37,6 @@ namespace ProductKeyManager.Service
             ];
 
             logger.Info(MyOperation.GetProductKey, OperationStatus.Started, logInfos);
-
-            ValidateGetRequest(request);
 
             IEnumerable<ProductKey> productKeys = FindProductKeys(request, request.Count)
                 .OrderBy(x => x.ProductName)
@@ -75,8 +72,6 @@ namespace ProductKeyManager.Service
 
             logger.Info(MyOperation.AddProductKey, OperationStatus.Started, logInfos);
 
-            ValidateStoreRequest(request);
-
             ProductKey productKey = CreateProductKeyFromRequest(request);
             AddProductKey(productKey);
 
@@ -97,76 +92,10 @@ namespace ProductKeyManager.Service
 
             logger.Info(MyOperation.UpdateProductKey, OperationStatus.Started, logInfos);
 
-            ValidateUpdateRequest(request);
-
             ProductKey productKey = CreateProductKeyFromRequest(request);
             UpdateProductKeyDetails(productKey);
 
             logger.Debug(MyOperation.UpdateProductKey, OperationStatus.Success, logInfos);
-        }
-
-        void ValidateGetRequest(GetProductKeyRequest request)
-        {
-            try
-            {
-                request.ValidateHMAC(securitySettings.SharedSecretKey);
-            }
-            catch (SecurityException ex)
-            {
-                logger.Error(
-                    MyOperation.GetProductKey,
-                    OperationStatus.Failure,
-                    ex,
-                    new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
-                    new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
-                    new LogInfo(MyLogInfoKey.Key, request.Key));
-
-                throw;
-            }
-        }
-
-        void ValidateStoreRequest(AddProductKeyRequest request)
-        {
-            try
-            {
-                request.ValidateHMAC(securitySettings.SharedSecretKey);
-
-                ArgumentNullException.ThrowIfNullOrWhiteSpace(request.Key);
-            }
-            catch (SecurityException ex)
-            {
-                logger.Error(
-                    MyOperation.AddProductKey,
-                    OperationStatus.Failure,
-                    ex,
-                    new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
-                    new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
-                    new LogInfo(MyLogInfoKey.Key, request.Key));
-
-                throw;
-            }
-        }
-
-        void ValidateUpdateRequest(UpdateProductKeyRequest request)
-        {
-            try
-            {
-                request.ValidateHMAC(securitySettings.SharedSecretKey);
-
-                ArgumentNullException.ThrowIfNullOrWhiteSpace(request.Key);
-            }
-            catch (SecurityException ex)
-            {
-                logger.Error(
-                    MyOperation.UpdateProductKey,
-                    OperationStatus.Failure,
-                    ex,
-                    new LogInfo(MyLogInfoKey.StoreName, request.StoreName),
-                    new LogInfo(MyLogInfoKey.ProductName, request.ProductName),
-                    new LogInfo(MyLogInfoKey.Key, request.Key));
-
-                throw;
-            }
         }
 
         IEnumerable<ProductKey> FindProductKeys(GetProductKeyRequest request, int count)
