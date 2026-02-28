@@ -38,7 +38,7 @@ Retrieve product keys by query parameters:
 
 ### Prerequisites
 
-- [.NET 9.0 SDK](https://dotnet.microsoft.com/)
+- [.NET 10.0 SDK](https://dotnet.microsoft.com/)
 
 ### Run via CLI
 
