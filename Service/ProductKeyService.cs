@@ -142,7 +142,7 @@ namespace ProductKeyManager.Service
         void AddProductKey(ProductKey productKey)
         {
             productKeyRepository.Add(productKey.ToDataObject());
-            productKeyRepository.ApplyChanges();
+            productKeyRepository.SaveChanges();
         }
 
         void UpdateProductKeyDetails(ProductKey productKey)
@@ -177,7 +177,7 @@ namespace ProductKeyManager.Service
             productKeyToUpdate.UpdatedDateTime = DateTime.Now;
 
             productKeyRepository.Update(productKeyToUpdate.ToDataObject());
-            productKeyRepository.ApplyChanges();
+            productKeyRepository.SaveChanges();
         }
 
         static string GenerateKeyId(string key)
