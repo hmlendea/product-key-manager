@@ -5,9 +5,7 @@ using NuciDAL.Repositories;
 using NuciLog;
 using NuciLog.Configuration;
 using NuciLog.Core;
-using NuciSecurity.HMAC;
 
-using ProductKeyManager.Api.Models;
 using ProductKeyManager.Configuration;
 using ProductKeyManager.DataAccess.DataObjects;
 using ProductKeyManager.Service;
