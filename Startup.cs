@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NuciAPI.Middleware;
 using ProductKeyManager.Configuration;
 
 namespace ProductKeyManager
@@ -18,6 +19,8 @@ namespace ProductKeyManager
 
             services
                 .AddConfigurations(Configuration)
+                .AddNuciApiScannerProtection()
+                .AddNuciApiReplayProtection()
                 .AddCustomServices();
         }
 
@@ -39,6 +42,10 @@ namespace ProductKeyManager
                 File.WriteAllText(dataStoreSettings.ProductKeysStorePath, "<?xml version=\"1.0\" encoding=\"utf-8\"?><ArrayOfProductKeyEntity xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"></ArrayOfProductKeyEntity>");
             }
 
+            app.UseNuciApiExceptionHandling();
+            app.UseNuciApiScannerProtection();
+            app.UseNuciApiRequestLogging();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -48,6 +55,10 @@ namespace ProductKeyManager
             app.UseDefaultFiles();
             app.UseStaticFiles();
             app.UseRouting();
+
+            app.UseNuciApiHeaderValidation();
+            app.UseNuciApiReplayProtection();
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
