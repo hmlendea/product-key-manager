@@ -16,23 +16,19 @@ namespace ProductKeyManager
     {
         static DataStoreSettings dataStoreSettings;
         static SecuritySettings securitySettings;
-        static NuciLoggerSettings logSettings;
 
         public static IServiceCollection AddConfigurations(this IServiceCollection services, IConfiguration configuration)
         {
             dataStoreSettings = new DataStoreSettings();
             securitySettings = new SecuritySettings();
-            logSettings = new NuciLoggerSettings();
 
             configuration.Bind(nameof(DataStoreSettings), dataStoreSettings);
             configuration.Bind(nameof(SecuritySettings), securitySettings);
-            configuration.Bind(nameof(NuciLoggerSettings), logSettings);
 
-            services.AddSingleton(dataStoreSettings);
-            services.AddSingleton(securitySettings);
-            services.AddSingleton(logSettings);
-
-            return services;
+            return services
+                .AddSingleton(dataStoreSettings)
+                .AddSingleton(securitySettings)
+                .AddNuciLoggerSettings(configuration);
         }
 
         public static IServiceCollection AddCustomServices(this IServiceCollection services) => services
