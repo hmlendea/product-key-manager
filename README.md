@@ -1,95 +1,110 @@
-[![Donate](https://img.shields.io/badge/-%E2%99%A5%20Donate-%23ff69b4)](https://hmlendea.go.ro/funding) [![Latest GitHub release](https://img.shields.io/github/v/release/hmlendea/product-key-manager)](https://github.com/hmlendea/product-key-manager/releases/latest) [![Build Status](https://github.com/hmlendea/product-key-manager/actions/workflows/dotnet.yml/badge.svg)](https://github.com/hmlendea/product-key-manager/actions/workflows/dotnet.yml)
-# 🔐 Product Key Manager
+[![Donate](https://img.shields.io/badge/-%E2%99%A5%20Donate-%23ff69b4)](https://hmlendea.go.ro/funding)
+[![Latest Release](https://img.shields.io/github/v/release/hmlendea/product-key-manager)](https://github.com/hmlendea/product-key-manager/releases/latest)
+[![Build Status](https://github.com/hmlendea/product-key-manager/actions/workflows/dotnet.yml/badge.svg)](https://github.com/hmlendea/product-key-manager/actions/workflows/dotnet.yml)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://gnu.org/licenses/gpl-3.0)
 
-> A lightweight RESTful service for managing product keys – storing, filtering, and retrieving them securely via API.
+# Product Key Manager
 
----
+A lightweight RESTful service for managing product keys - storing, filtering, and retrieving them securely via API.
 
-## 🚀 Features
+## Features
 
-- Store and retrieve product keys via HTTP GET/POST
-- Filtering by store, product, owner, key status, etc.
-- HMAC verification for secure access
-- Clean architecture with DI, service layers and configuration
+- Store, retrieve, and update product keys via HTTP GET/POST/PUT
+- Filter keys by store, product, owner, key value, and status
+- String filters support regex patterns
+- HMAC request signing for secure access
+- Product key statuses: `Unknown`, `Vacant`, `Used`, `Invalid`, `AlreadyOwned`, `RequiresBaseProduct`, `RegionLocked`
 
----
+## Development
 
-## 📦 API Overview
+### Requirements
 
-### `GET /ProductKeys`
+- [.NET 10.0 SDK](https://dotnet.microsoft.com/download)
 
-Retrieve product keys by query parameters:
+All NuGet dependencies are restored automatically by `dotnet restore`.
 
-#### Query Parameters:
-
-| Param   | Type   | Description                         |
-|---------|--------|-------------------------------------|
-| store   | string | Key store identifier                |
-| product | string | Product name                        |
-| key     | string | Product key itself                  |
-| owner   | string | Key owner                           |
-| status  | string | Key status (`Vacant`, `Used`, etc.) |
-| count   | int    | Number of results to return         |
-| hmac    | string | Optional signature for verification |
-
----
-
-## 🧪 Running Locally
-
-### Prerequisites
-
-- [.NET 10.0 SDK](https://dotnet.microsoft.com/)
-
-### Run via CLI
+### Build
 
 ```bash
-git clone https://github.com/hmlendea/product-key-manager.git
-cd product-key-manager
-dotnet run
+dotnet build ProductKeyManager
 ```
 
-App will start on: `http://localhost:5000`
+### Run
 
----
-
-## ⚙️ Configuration
-
-Default config is in `appsettings.json`. You can override via environment variables or secrets:
-
-```json
-{
-  "securitySettings": {
-    "sharedSecretKey": "[[PRODUCT_KEY_MANAGER_SSK]]"
-  },
-  "dataStoreSettings": {
-    "productKeysStorePath": "[[PATH_TO_KEYS_XML]]"
-  },
-  "nuciLoggerSettings": {
-    "minimumLevel": "Info",
-    "logFilePath": "logfile.log",
-    "isFileOutputEnabled": true
-  }
-}
+```bash
+dotnet run --project ProductKeyManager
 ```
 
----
+### Test
 
-## 🛡️ Security
+```bash
+dotnet test ProductKeyManager.slnx
+```
 
-API requests are secured using HMAC validation:
+### Release
 
-1. Set the HMAC key/secret in config
-2. Send HMAC as query param
-3. Service will verify authenticity
+The repository includes `release.sh`, which delegates to the upstream deployment script used by the project maintainer.
 
----
+```bash
+bash ./release.sh 1.0.0
+```
 
-## 💖 Support
+This script downloads and executes an external release helper from `https://raw.githubusercontent.com/hmlendea/deployment-scripts/master/release/dotnet/10.0.sh`.
 
-If this project helps you, consider [donating](https://hmlendea.go.ro/funding) or giving a ⭐️ on GitHub!
+**Note:** Piping into `bash` is an intensely controversial topic. Please review any external scripts before running them in your environment!
 
----
+## Project Structure
 
-## 📄 License
+The solution contains the following projects:
 
-[GPL-3.0](https://github.com/hmlendea/product-key-manager/blob/master/LICENSE) © [hmlendea](https://github.com/hmlendea)
+- `ProductKeyManager` - main API application
+- `ProductKeyManager.UnitTests` - unit tests
+
+Key directories inside `ProductKeyManager/`:
+
+| Directory | Purpose |
+|-----------|---------|
+| `Api/Controllers/` | HTTP controllers |
+| `Api/Models/` | Request and response DTOs |
+| `Configuration/` | Settings classes |
+| `DataAccess/DataObjects/` | XML data objects |
+| `Logging/` | Log operation and info-key definitions |
+| `Service/` | Business logic services |
+| `Service/Mapping/` | Domain model mapping extensions |
+| `Service/Models/` | Domain models |
+
+### Dependencies
+
+| Package | Purpose |
+|---------|---------|
+| NuciAPI | Base API framework types and infrastructure |
+| NuciAPI.Controllers | Base controller with HMAC-validated request processing |
+| NuciAPI.Middleware | Core middleware support |
+| NuciAPI.Middleware.ExceptionHandling | Global exception-handling middleware |
+| NuciAPI.Middleware.Logging | Request-logging middleware |
+| NuciAPI.Middleware.Security | Scanner protection and replay-attack middleware |
+| NuciDAL | XML file repository for data persistence |
+| NuciExtensions | Collection and object extension utilities |
+| NuciLog | Logger implementation |
+| NuciLog.Core | Logging interfaces and types |
+| NuciSecurity.HMAC | HMAC request signing and verification |
+
+## Contributing
+
+Contributions are welcome.
+
+Please:
+
+- keep changes cross-platform
+- keep pull requests focused and consistent with existing style
+- update documentation when behaviour changes
+- add or update tests for new behaviour
+
+## Support
+
+If you find this project useful, consider [funding it](https://hmlendea.go.ro/funding) or giving a ⭐️ on GitHub!
+
+## License
+
+Licensed under the GNU General Public License v3.0 or later.
+See [LICENSE](./LICENSE) for details.
