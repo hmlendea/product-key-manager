@@ -2,7 +2,7 @@ using NuciDAL.DataObjects;
 
 namespace ProductKeyManager.DataAccess.DataObjects
 {
-    public sealed class ProductKeyEntity : EntityBase
+    public sealed class ProductKeyDataObject : EntityBase
     {
         public string StoreName { get; set; }
 

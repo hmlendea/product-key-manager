@@ -2,8 +2,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using NuciDAL.Repositories;
+
 using NuciLog;
-using NuciLog.Configuration;
 using NuciLog.Core;
 
 using ProductKeyManager.Configuration;
@@ -14,13 +14,12 @@ namespace ProductKeyManager
 {
     public static class ServiceCollectionExtensions
     {
-        static DataStoreSettings dataStoreSettings;
-        static SecuritySettings securitySettings;
-
-        public static IServiceCollection AddConfigurations(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddConfigurations(
+            this IServiceCollection services,
+            IConfiguration configuration)
         {
-            dataStoreSettings = new DataStoreSettings();
-            securitySettings = new SecuritySettings();
+            DataStoreSettings dataStoreSettings = new();
+            SecuritySettings securitySettings = new();
 
             configuration.Bind(nameof(DataStoreSettings), dataStoreSettings);
             configuration.Bind(nameof(SecuritySettings), securitySettings);
@@ -31,9 +30,12 @@ namespace ProductKeyManager
                 .AddNuciLoggerSettings(configuration);
         }
 
-        public static IServiceCollection AddCustomServices(this IServiceCollection services) => services
-            .AddSingleton<IFileRepository<ProductKeyEntity>>(x => new XmlRepository<ProductKeyEntity>(dataStoreSettings.ProductKeysStorePath))
+        public static IServiceCollection AddCustomServices(
+            this IServiceCollection services) => services
+            .AddSingleton<IFileRepository<ProductKeyDataObject>>(
+                serviceProvider => new XmlRepository<ProductKeyDataObject>(
+                    serviceProvider.GetRequiredService<DataStoreSettings>().ProductKeysStorePath))
             .AddSingleton<IProductKeyService, ProductKeyService>()
-            .AddScoped<ILogger, NuciLogger>();
+            .AddSingleton<ILogger, NuciLogger>();
     }
 }

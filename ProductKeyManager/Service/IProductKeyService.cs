@@ -6,7 +6,7 @@ namespace ProductKeyManager.Service
     {
         void AddProductKey(AddProductKeyRequest request);
 
-        ProductKeyResponse GetProductKey(GetProductKeyRequest request);
+        GetProductKeyResponse GetProductKey(GetProductKeyRequest request);
 
         void UpdateProductKey(UpdateProductKeyRequest request);
     }

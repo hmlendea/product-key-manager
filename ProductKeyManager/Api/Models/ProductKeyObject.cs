@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+
 using NuciSecurity.HMAC;
 
 namespace ProductKeyManager.Api.Models

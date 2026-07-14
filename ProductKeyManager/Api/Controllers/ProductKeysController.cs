@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+
 using NuciAPI.Controllers;
+
 using ProductKeyManager.Api.Models;
 using ProductKeyManager.Configuration;
 using ProductKeyManager.Service;
@@ -12,7 +14,7 @@ namespace ProductKeyManager.Api.Controllers
         IProductKeyService service,
         SecuritySettings securitySettings) : NuciApiController
     {
-        readonly NuciApiAuthorisation authorisation = NuciApiAuthorisation.ApiKey(securitySettings.SharedSecretKey);
+        private readonly NuciApiAuthorisation authorisation = NuciApiAuthorisation.ApiKey(securitySettings.SharedSecretKey);
 
         [HttpGet]
         public ActionResult GetProductKey([FromBody] GetProductKeyRequest request)

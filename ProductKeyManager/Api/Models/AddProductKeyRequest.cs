@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
+
 using NuciAPI.Requests;
+
 using NuciSecurity.HMAC;
 
 namespace ProductKeyManager.Api.Models
