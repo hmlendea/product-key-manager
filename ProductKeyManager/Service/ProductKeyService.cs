@@ -132,7 +132,7 @@ namespace ProductKeyManager.Service
 
             string pattern = filterValue;
 
-            if (pattern[0].NotEquals('^') && pattern[^1].NotEquals('$'))
+            if (pattern[0] != '^' && pattern[^1] != '$')
             {
                 pattern = $"^{pattern}$";
             }
@@ -170,7 +170,7 @@ namespace ProductKeyManager.Service
                 productKeyToUpdate.Comment = productKey.Comment;
             }
 
-            if (productKey.Status.NotEquals(ProductKeyStatus.Unknown))
+            if (productKey.Status != ProductKeyStatus.Unknown)
             {
                 productKeyToUpdate.Status = productKey.Status;
             }
@@ -186,7 +186,9 @@ namespace ProductKeyManager.Service
 
         private static ProductKey CreateProductKeyFromRequest(AddProductKeyRequest request)
         {
-            ProductKey productKey = new()
+            DateTime addedDateTime = DateTime.Now;
+
+            return new()
             {
                 Id = GenerateKeyId(request.Key),
                 StoreName = request.StoreName,
@@ -195,11 +197,9 @@ namespace ProductKeyManager.Service
                 Owner = request.Owner,
                 Comment = request.Comment,
                 Status = ProductKeyStatus.FromName(request.Status),
-                AddedDateTime = DateTime.Now
+                AddedDateTime = addedDateTime,
+                UpdatedDateTime = addedDateTime
             };
-            productKey.UpdatedDateTime = productKey.AddedDateTime;
-
-            return productKey;
         }
 
         private static ProductKey CreateProductKeyFromRequest(UpdateProductKeyRequest request) => new()

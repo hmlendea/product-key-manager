@@ -17,7 +17,11 @@ namespace ProductKeyManager
     public class Startup(IConfiguration configuration)
     {
         private static string EmptyProductKeysStoreContent
-            => "<?xml version=\"1.0\" encoding=\"utf-8\"?><ArrayOfProductKeyDataObject xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"></ArrayOfProductKeyDataObject>";
+            => "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+                + "<ArrayOfProductKeyDataObject"
+                + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
+                + " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">"
+                + "</ArrayOfProductKeyDataObject>";
 
         public IConfiguration Configuration => configuration;
 
@@ -39,8 +43,7 @@ namespace ProductKeyManager
                 .GetRequiredService<DataStoreSettings>();
             string directory = Path.GetDirectoryName(dataStoreSettings.ProductKeysStorePath);
 
-            if (!string.IsNullOrWhiteSpace(directory) &&
-                !Directory.Exists(directory))
+            if (!string.IsNullOrWhiteSpace(directory) && !Directory.Exists(directory))
             {
                 Directory.CreateDirectory(directory);
             }

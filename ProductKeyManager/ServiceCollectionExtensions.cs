@@ -14,15 +14,12 @@ namespace ProductKeyManager
 {
     public static class ServiceCollectionExtensions
     {
-        private static DataStoreSettings dataStoreSettings;
-        private static SecuritySettings securitySettings;
-
         public static IServiceCollection AddConfigurations(
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            dataStoreSettings = new DataStoreSettings();
-            securitySettings = new SecuritySettings();
+            DataStoreSettings dataStoreSettings = new();
+            SecuritySettings securitySettings = new();
 
             configuration.Bind(nameof(DataStoreSettings), dataStoreSettings);
             configuration.Bind(nameof(SecuritySettings), securitySettings);
@@ -37,7 +34,7 @@ namespace ProductKeyManager
             this IServiceCollection services) => services
             .AddSingleton<IFileRepository<ProductKeyDataObject>>(
                 serviceProvider => new XmlRepository<ProductKeyDataObject>(
-                    dataStoreSettings.ProductKeysStorePath))
+                    serviceProvider.GetRequiredService<DataStoreSettings>().ProductKeysStorePath))
             .AddSingleton<IProductKeyService, ProductKeyService>()
             .AddSingleton<ILogger, NuciLogger>();
     }

@@ -6,10 +6,12 @@ using System.Security.Cryptography;
 using System.Text;
 
 using NSubstitute;
-using NUnit.Framework;
 
 using NuciDAL.Repositories;
+
 using NuciLog.Core;
+
+using NUnit.Framework;
 
 using ProductKeyManager.Api.Models;
 using ProductKeyManager.Configuration;
@@ -24,10 +26,10 @@ namespace ProductKeyManager.UnitTests.Service
         private static string DateTimeFormat => "yyyy.MM.ddTHH:mm:ss.ffffzzz";
         private static string TestAddedDateTime => new DateTime(2012, 9, 5, 0, 0, 0, DateTimeKind.Utc).ToString(DateTimeFormat);
 
-        private IFileRepository<ProductKeyDataObject> repository;
-        private SecuritySettings securitySettings;
-        private ILogger logger;
-        private ProductKeyService service;
+        IFileRepository<ProductKeyDataObject> repository;
+        SecuritySettings securitySettings;
+        ILogger logger;
+        ProductKeyService service;
 
         [SetUp]
         public void SetUp()

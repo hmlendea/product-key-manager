@@ -23,8 +23,14 @@ namespace ProductKeyManager.Service.Mapping
             ConfirmationCode = dataObject.ConfirmationCode,
             Comment = dataObject.Comment,
             Status = ProductKeyStatus.FromName(dataObject.Status),
-            AddedDateTime = DateTime.ParseExact(dataObject.AddedDateTime, DateTimeFormat, CultureInfo.InvariantCulture),
-            UpdatedDateTime = DateTime.ParseExact(dataObject.UpdatedDateTime, DateTimeFormat, CultureInfo.InvariantCulture)
+            AddedDateTime = DateTime.ParseExact(
+                dataObject.AddedDateTime,
+                DateTimeFormat,
+                CultureInfo.InvariantCulture),
+            UpdatedDateTime = DateTime.ParseExact(
+                dataObject.UpdatedDateTime,
+                DateTimeFormat,
+                CultureInfo.InvariantCulture)
         };
 
         internal static ProductKeyDataObject ToDataObject(this ProductKey domainModel) => new()

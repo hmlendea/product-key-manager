@@ -70,7 +70,7 @@ namespace ProductKeyManager.Service.Models
                 return true;
             }
 
-            if (obj.GetType().NotEquals(GetType()))
+            if (obj.GetType() != GetType())
             {
                 return false;
             }
