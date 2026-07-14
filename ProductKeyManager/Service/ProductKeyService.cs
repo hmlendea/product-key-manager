@@ -6,7 +6,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 using NuciDAL.Repositories;
+
 using NuciExtensions;
+
 using NuciLog.Core;
 
 using ProductKeyManager.Api.Models;
@@ -18,12 +20,12 @@ using ProductKeyManager.Service.Models;
 
 namespace ProductKeyManager.Service
 {
-    public class ProductKeyService(
-        IFileRepository<ProductKeyEntity> productKeyRepository,
+    public sealed class ProductKeyService(
+        IFileRepository<ProductKeyDataObject> productKeyRepository,
         SecuritySettings securitySettings,
         ILogger logger) : IProductKeyService
     {
-        public ProductKeyResponse GetProductKey(GetProductKeyRequest request)
+        public GetProductKeyResponse GetProductKey(GetProductKeyRequest request)
         {
             IEnumerable<LogInfo> logInfos =
             [
@@ -38,18 +40,18 @@ namespace ProductKeyManager.Service
             logger.Info(MyOperation.GetProductKey, OperationStatus.Started, logInfos);
 
             IEnumerable<ProductKey> productKeys = FindProductKeys(request, request.Count)
-                .OrderBy(x => x.ProductName)
-                .ThenBy(x => x.Key);
+                .OrderBy(productKey => productKey.ProductName)
+                .ThenBy(productKey => productKey.Key);
 
             if (EnumerableExt.IsNullOrEmpty(productKeys))
             {
-                Exception ex = new NullReferenceException("No key found for the given filters");
-                logger.Info(MyOperation.GetProductKey, OperationStatus.Failure, ex, logInfos);
+                Exception exception = new NullReferenceException("No key found for the given filters");
+                logger.Info(MyOperation.GetProductKey, OperationStatus.Failure, exception, logInfos);
 
-                throw ex;
+                throw exception;
             }
 
-            ProductKeyResponse response = new(productKeys.ToApiObjects());
+            GetProductKeyResponse response = new(productKeys.ToApiObjects());
             response.SignHMAC(securitySettings.SharedSecretKey);
 
             logger.Info(MyOperation.GetProductKey, OperationStatus.Success, logInfos);
@@ -97,26 +99,26 @@ namespace ProductKeyManager.Service
             logger.Debug(MyOperation.UpdateProductKey, OperationStatus.Success, logInfos);
         }
 
-        IEnumerable<ProductKey> FindProductKeys(GetProductKeyRequest request, int count)
+        private IEnumerable<ProductKey> FindProductKeys(GetProductKeyRequest request, int count)
         {
-            IList<ProductKeyEntity> shuffledCandidates = productKeyRepository
+            IEnumerable<ProductKeyDataObject> shuffledCandidates = productKeyRepository
                 .GetAll()
-                .Where(x =>
-                    DoesPropertyMatchFilter(x.StoreName, request.StoreName) &&
-                    DoesPropertyMatchFilter(x.ProductName, request.ProductName) &&
-                    DoesPropertyMatchFilter(x.Key, request.Key) &&
-                    DoesPropertyMatchFilter(x.Owner, request.Owner) &&
-                    DoesPropertyMatchFilter(x.Status, request.Status))
+                .Where(dataObject =>
+                    DoesPropertyMatchFilter(dataObject.StoreName, request.StoreName) &&
+                    DoesPropertyMatchFilter(dataObject.ProductName, request.ProductName) &&
+                    DoesPropertyMatchFilter(dataObject.Key, request.Key) &&
+                    DoesPropertyMatchFilter(dataObject.Owner, request.Owner) &&
+                    DoesPropertyMatchFilter(dataObject.Status, request.Status))
                 .Distinct()
                 .ToList()
                 .Shuffle();
 
             return shuffledCandidates
-                .ToServiceModels()
-                .Take(Math.Min(count, shuffledCandidates.Count));
+                .ToDomainModels()
+                .Take(Math.Min(count, shuffledCandidates.Count()));
         }
 
-        static bool DoesPropertyMatchFilter(string value, string filterValue)
+        private static bool DoesPropertyMatchFilter(string value, string filterValue)
         {
             if (string.IsNullOrWhiteSpace(filterValue))
             {
@@ -138,15 +140,15 @@ namespace ProductKeyManager.Service
             return Regex.IsMatch(value, pattern);
         }
 
-        void AddProductKey(ProductKey productKey)
+        private void AddProductKey(ProductKey productKey)
         {
             productKeyRepository.Add(productKey.ToDataObject());
             productKeyRepository.SaveChanges();
         }
 
-        void UpdateProductKeyDetails(ProductKey productKey)
+        private void UpdateProductKeyDetails(ProductKey productKey)
         {
-            ProductKey productKeyToUpdate = productKeyRepository.Get(productKey.Id).ToServiceModel();
+            ProductKey productKeyToUpdate = productKeyRepository.Get(productKey.Id).ToDomainModel();
 
             if (!string.IsNullOrWhiteSpace(productKey.StoreName))
             {
@@ -179,10 +181,10 @@ namespace ProductKeyManager.Service
             productKeyRepository.SaveChanges();
         }
 
-        static string GenerateKeyId(string key)
+        private static string GenerateKeyId(string key)
             => new Guid(MD5.HashData(Encoding.Default.GetBytes(key))).ToString();
 
-        static ProductKey CreateProductKeyFromRequest(AddProductKeyRequest request)
+        private static ProductKey CreateProductKeyFromRequest(AddProductKeyRequest request)
         {
             ProductKey productKey = new()
             {
@@ -200,7 +202,7 @@ namespace ProductKeyManager.Service
             return productKey;
         }
 
-        static ProductKey CreateProductKeyFromRequest(UpdateProductKeyRequest request) => new()
+        private static ProductKey CreateProductKeyFromRequest(UpdateProductKeyRequest request) => new()
         {
             Id = GenerateKeyId(request.Key),
             StoreName = request.StoreName,

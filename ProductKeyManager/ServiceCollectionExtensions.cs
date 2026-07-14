@@ -2,8 +2,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using NuciDAL.Repositories;
+
 using NuciLog;
-using NuciLog.Configuration;
 using NuciLog.Core;
 
 using ProductKeyManager.Configuration;
@@ -14,8 +14,8 @@ namespace ProductKeyManager
 {
     public static class ServiceCollectionExtensions
     {
-        static DataStoreSettings dataStoreSettings;
-        static SecuritySettings securitySettings;
+        private static DataStoreSettings dataStoreSettings;
+        private static SecuritySettings securitySettings;
 
         public static IServiceCollection AddConfigurations(this IServiceCollection services, IConfiguration configuration)
         {
@@ -32,8 +32,8 @@ namespace ProductKeyManager
         }
 
         public static IServiceCollection AddCustomServices(this IServiceCollection services) => services
-            .AddSingleton<IFileRepository<ProductKeyEntity>>(x => new XmlRepository<ProductKeyEntity>(dataStoreSettings.ProductKeysStorePath))
+            .AddSingleton<IFileRepository<ProductKeyDataObject>>(serviceProvider => new XmlRepository<ProductKeyDataObject>(dataStoreSettings.ProductKeysStorePath))
             .AddSingleton<IProductKeyService, ProductKeyService>()
-            .AddScoped<ILogger, NuciLogger>();
+            .AddSingleton<ILogger, NuciLogger>();
     }
 }

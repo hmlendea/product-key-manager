@@ -13,9 +13,7 @@ using NuciLog.Core;
 
 using ProductKeyManager.Api.Models;
 using ProductKeyManager.Configuration;
-using ProductKeyManager.DataAccess.DataObjects;
 using ProductKeyManager.Service;
-using ProductKeyManager.Service.Models;
 
 namespace ProductKeyManager.UnitTests.Service
 {
