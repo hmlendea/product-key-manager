@@ -35,8 +35,10 @@ namespace ProductKeyManager
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             // Ensure the product keys store exists
-            DataStoreSettings dataStoreSettings = app.ApplicationServices.GetRequiredService<DataStoreSettings>();
-            string directory = Path.GetDirectoryName(dataStoreSettings.ProductKeysStorePath);
+            DataStoreSettings dataStoreSettings = app.ApplicationServices
+                .GetRequiredService<DataStoreSettings>();
+            string directory = Path.GetDirectoryName(
+                dataStoreSettings.ProductKeysStorePath);
 
             if (!string.IsNullOrWhiteSpace(directory) &&
                 !Directory.Exists(directory))

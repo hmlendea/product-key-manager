@@ -8,14 +8,14 @@ using ProductKeyManager.Api.Models;
 namespace ProductKeyManager.UnitTests.Api.Models
 {
     [TestFixture]
-    public sealed class ProductKeyResponseTests
+    public sealed class GetProductKeyResponseTests
     {
         [Test]
         public void Constructor_WithSingleProductKeyObject_SetsProductKeysToCollectionWithThatObject()
         {
             ProductKeyObject productKeyObject = new() { Key = "DARK-SOUL-S613-MNOP", Store = "NucilandiaSteam" };
 
-            ProductKeyResponse response = new(productKeyObject);
+            GetProductKeyResponse response = new(productKeyObject);
 
             Assert.That(response.ProductKeys.Count(), Is.EqualTo(1));
             Assert.That(response.ProductKeys.First().Key, Is.EqualTo("DARK-SOUL-S613-MNOP"));
@@ -31,7 +31,7 @@ namespace ProductKeyManager.UnitTests.Api.Models
                 new() { Key = "DARK-SOUL-S613-CCC3" }
             };
 
-            ProductKeyResponse response = new(productKeyObjects);
+            GetProductKeyResponse response = new(productKeyObjects);
 
             Assert.That(response.ProductKeys.Count(), Is.EqualTo(3));
         }
@@ -41,7 +41,7 @@ namespace ProductKeyManager.UnitTests.Api.Models
         {
             List<ProductKeyObject> productKeyObjects = new();
 
-            ProductKeyResponse response = new(productKeyObjects);
+            GetProductKeyResponse response = new(productKeyObjects);
 
             Assert.That(response.ProductKeys.Count(), Is.EqualTo(0));
         }
@@ -51,7 +51,7 @@ namespace ProductKeyManager.UnitTests.Api.Models
         {
             ProductKeyObject productKeyObject = new() { Key = "DARK-SOUL-S613-MNOP" };
 
-            ProductKeyResponse response = new(productKeyObject);
+            GetProductKeyResponse response = new(productKeyObject);
 
             Assert.That(response.Count, Is.EqualTo(1));
         }
@@ -66,7 +66,7 @@ namespace ProductKeyManager.UnitTests.Api.Models
                 new() { Key = "DARK-SOUL-S613-CCC3" }
             };
 
-            ProductKeyResponse response = new(productKeyObjects);
+            GetProductKeyResponse response = new(productKeyObjects);
 
             Assert.That(response.Count, Is.EqualTo(3));
         }
@@ -74,7 +74,7 @@ namespace ProductKeyManager.UnitTests.Api.Models
         [Test]
         public void Count_WithEmptyCollection_ReturnsZero()
         {
-            ProductKeyResponse response = new(new List<ProductKeyObject>());
+            GetProductKeyResponse response = new(new List<ProductKeyObject>());
 
             Assert.That(response.Count, Is.EqualTo(0));
         }
@@ -92,7 +92,7 @@ namespace ProductKeyManager.UnitTests.Api.Models
                 Status = "Vacant"
             };
 
-            ProductKeyResponse response = new(productKeyObject);
+            GetProductKeyResponse response = new(productKeyObject);
 
             ProductKeyObject returnedObject = response.ProductKeys.First();
             Assert.That(returnedObject.Store, Is.EqualTo("NucilandiaSteam"));

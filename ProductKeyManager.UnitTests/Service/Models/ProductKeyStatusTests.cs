@@ -13,7 +13,7 @@ namespace ProductKeyManager.UnitTests.Service.Models
         [Test]
         public void Values_ContainsAllSevenStatuses()
         {
-            int count = ProductKeyStatus.Values.Count();
+            int count = ProductKeyStatus.GetValues().Length;
 
             Assert.That(count, Is.EqualTo(7));
         }
