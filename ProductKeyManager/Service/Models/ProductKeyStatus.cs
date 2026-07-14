@@ -89,7 +89,7 @@ namespace ProductKeyManager.Service.Models
                 return other is null;
             }
 
-            return current.Equals(other);
+            return object.Equals(current, other);
         }
 
         public static bool operator !=(ProductKeyStatus current, ProductKeyStatus other)

@@ -21,13 +21,13 @@ namespace ProductKeyManager.UnitTests.Service
     [TestFixture]
     public sealed class ProductKeyServiceTests
     {
-        static string DateTimeFormat => "yyyy.MM.ddTHH:mm:ss.ffffzzz";
-        static string TestAddedDateTime => new DateTime(2012, 9, 5, 0, 0, 0, DateTimeKind.Utc).ToString(DateTimeFormat);
+        private static string DateTimeFormat => "yyyy.MM.ddTHH:mm:ss.ffffzzz";
+        private static string TestAddedDateTime => new DateTime(2012, 9, 5, 0, 0, 0, DateTimeKind.Utc).ToString(DateTimeFormat);
 
-        IFileRepository<ProductKeyDataObject> repository;
-        SecuritySettings securitySettings;
-        ILogger logger;
-        ProductKeyService service;
+        private IFileRepository<ProductKeyDataObject> repository;
+        private SecuritySettings securitySettings;
+        private ILogger logger;
+        private ProductKeyService service;
 
         [SetUp]
         public void SetUp()
@@ -38,11 +38,14 @@ namespace ProductKeyManager.UnitTests.Service
             service = new ProductKeyService(repository, securitySettings, logger);
         }
 
+        // ── GetProductKey ─────────────────────────────────────────────────────────────
+
         [Test]
-        public void GetProductKey_WhenRepositoryHasOneMatchingEntity_ReturnsResponseWithOneKey()
+        public void GivenRepositoryHasOneMatchingEntity_WhenGetProductKeyIsCalled_ThenReturnsResponseWithOneKey()
         {
             ProductKeyDataObject entity = CreateTestEntity("DARK-SOUL-S613-MNOP", "NucilandiaSteam", "DarkSouls", "Vacant");
-            repository.GetAll().Returns(new List<ProductKeyDataObject> { entity });
+            IEnumerable<ProductKeyDataObject> entities = [entity];
+            repository.GetAll().Returns(entities);
 
             GetProductKeyRequest request = new() { Count = 1 };
 
@@ -53,14 +56,14 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void GetProductKey_WhenRepositoryHasMultipleMatchingEntities_ReturnsAllMatchingKeys()
+        public void GivenRepositoryHasMultipleMatchingEntities_WhenGetProductKeyIsCalled_ThenReturnsAllMatchingKeys()
         {
-            List<ProductKeyDataObject> entities = new()
-            {
+            IEnumerable<ProductKeyDataObject> entities =
+            [
                 CreateTestEntity("DARK-SOUL-S613-AAA1", "NucilandiaSteam", "DarkSouls", "Vacant"),
                 CreateTestEntity("DARK-SOUL-S613-BBB2", "NucilandiaSteam", "DarkSouls", "Vacant"),
                 CreateTestEntity("DARK-SOUL-S613-CCC3", "NucilandiaSteam", "DarkSouls", "Vacant")
-            };
+            ];
             repository.GetAll().Returns(entities);
 
             GetProductKeyRequest request = new() { Count = 3 };
@@ -71,9 +74,10 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void GetProductKey_WhenRepositoryIsEmpty_ThrowsNullReferenceException()
+        public void GivenRepositoryIsEmpty_WhenGetProductKeyIsCalled_ThenThrowsNullReferenceException()
         {
-            repository.GetAll().Returns(new List<ProductKeyDataObject>());
+            IEnumerable<ProductKeyDataObject> emptyEntities = [];
+            repository.GetAll().Returns(emptyEntities);
 
             GetProductKeyRequest request = new() { Count = 1 };
 
@@ -81,14 +85,14 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void GetProductKey_WithCountOne_WhenMultipleEntitiesMatch_ReturnsOneKey()
+        public void GivenMultipleEntitiesMatch_WhenGetProductKeyIsCalledWithCountOne_ThenReturnsOneKey()
         {
-            List<ProductKeyDataObject> entities = new()
-            {
+            IEnumerable<ProductKeyDataObject> entities =
+            [
                 CreateTestEntity("DARK-SOUL-S613-AAA1", "NucilandiaSteam", "DarkSouls", "Vacant"),
                 CreateTestEntity("DARK-SOUL-S613-BBB2", "NucilandiaSteam", "DarkSouls", "Vacant"),
                 CreateTestEntity("DARK-SOUL-S613-CCC3", "NucilandiaSteam", "DarkSouls", "Vacant")
-            };
+            ];
             repository.GetAll().Returns(entities);
 
             GetProductKeyRequest request = new() { Count = 1 };
@@ -99,16 +103,16 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void GetProductKey_WithCountLessThanMatchingEntities_ReturnsOnlyCount()
+        public void GivenFiveMatchingEntities_WhenGetProductKeyIsCalledWithCountTwo_ThenReturnsTwoKeys()
         {
-            List<ProductKeyDataObject> entities = new()
-            {
+            IEnumerable<ProductKeyDataObject> entities =
+            [
                 CreateTestEntity("DARK-SOUL-S613-AAA1", "NucilandiaSteam", "DarkSouls", "Vacant"),
                 CreateTestEntity("DARK-SOUL-S613-BBB2", "NucilandiaSteam", "DarkSouls", "Vacant"),
                 CreateTestEntity("DARK-SOUL-S613-CCC3", "NucilandiaSteam", "DarkSouls", "Vacant"),
                 CreateTestEntity("DARK-SOUL-S613-DDD4", "NucilandiaSteam", "DarkSouls", "Vacant"),
                 CreateTestEntity("DARK-SOUL-S613-EEE5", "NucilandiaSteam", "DarkSouls", "Vacant")
-            };
+            ];
             repository.GetAll().Returns(entities);
 
             GetProductKeyRequest request = new() { Count = 2 };
@@ -119,13 +123,13 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void GetProductKey_WithCountGreaterThanMatchingEntities_ReturnsAllMatchingEntities()
+        public void GivenTwoMatchingEntities_WhenGetProductKeyIsCalledWithCountOneHundred_ThenReturnsBothMatchingEntities()
         {
-            List<ProductKeyDataObject> entities = new()
-            {
+            IEnumerable<ProductKeyDataObject> entities =
+            [
                 CreateTestEntity("DARK-SOUL-S613-AAA1", "NucilandiaSteam", "DarkSouls", "Vacant"),
                 CreateTestEntity("DARK-SOUL-S613-BBB2", "NucilandiaSteam", "DarkSouls", "Vacant")
-            };
+            ];
             repository.GetAll().Returns(entities);
 
             GetProductKeyRequest request = new() { Count = 100 };
@@ -136,14 +140,14 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void GetProductKey_WithNullFilters_ReturnsAllEntities()
+        public void GivenEntitiesWithMixedAttributes_WhenGetProductKeyIsCalledWithNullFilters_ThenReturnsAllEntities()
         {
-            List<ProductKeyDataObject> entities = new()
-            {
+            IEnumerable<ProductKeyDataObject> entities =
+            [
                 CreateTestEntity("DARK-SOUL-S613-AAA1", "NucilandiaSteam", "DarkSouls", "Vacant"),
                 CreateTestEntity("DARK-SOUL-S873-BBB2", "NucilandiaGog", "BloodBorne", "Used"),
                 CreateTestEntity("DARK-SOUL-S873-CCC3", "NucilandiaSteam", "Sekiro", "Vacant")
-            };
+            ];
             repository.GetAll().Returns(entities);
 
             GetProductKeyRequest request = new() { Count = 10 };
@@ -154,13 +158,13 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void GetProductKey_WithStoreNameFilter_ReturnsOnlyMatchingEntities()
+        public void GivenEntitiesWithDifferentStoreNames_WhenGetProductKeyIsCalledWithStoreNameFilter_ThenReturnsOnlyMatchingEntities()
         {
-            List<ProductKeyDataObject> entities = new()
-            {
+            IEnumerable<ProductKeyDataObject> entities =
+            [
                 CreateTestEntity("STEAM-KEY-S613-AAA1", "NucilandiaSteam", "DarkSouls", "Vacant"),
                 CreateTestEntity("GOG-KEY-S613-BBB2", "NucilandiaGog", "DarkSouls", "Vacant")
-            };
+            ];
             repository.GetAll().Returns(entities);
 
             GetProductKeyRequest request = new() { StoreName = "NucilandiaSteam", Count = 10 };
@@ -172,13 +176,13 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void GetProductKey_WithProductNameFilter_ReturnsOnlyMatchingEntities()
+        public void GivenEntitiesWithDifferentProductNames_WhenGetProductKeyIsCalledWithProductNameFilter_ThenReturnsOnlyMatchingEntities()
         {
-            List<ProductKeyDataObject> entities = new()
-            {
+            IEnumerable<ProductKeyDataObject> entities =
+            [
                 CreateTestEntity("DS-KEY-S613-AAA1", "NucilandiaSteam", "DarkSouls", "Vacant"),
                 CreateTestEntity("BB-KEY-S613-BBB2", "NucilandiaSteam", "BloodBorne", "Vacant")
-            };
+            ];
             repository.GetAll().Returns(entities);
 
             GetProductKeyRequest request = new() { ProductName = "DarkSouls", Count = 10 };
@@ -190,13 +194,13 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void GetProductKey_WithKeyFilter_ReturnsOnlyMatchingEntity()
+        public void GivenEntitiesWithDifferentKeys_WhenGetProductKeyIsCalledWithKeyFilter_ThenReturnsOnlyMatchingEntity()
         {
-            List<ProductKeyDataObject> entities = new()
-            {
+            IEnumerable<ProductKeyDataObject> entities =
+            [
                 CreateTestEntity("DARK-SOUL-S613-AAA1", "NucilandiaSteam", "DarkSouls", "Vacant"),
                 CreateTestEntity("DARK-SOUL-S873-BBB2", "NucilandiaSteam", "DarkSouls", "Vacant")
-            };
+            ];
             repository.GetAll().Returns(entities);
 
             GetProductKeyRequest request = new() { Key = "DARK-SOUL-S613-AAA1", Count = 10 };
@@ -208,13 +212,13 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void GetProductKey_WithOwnerFilter_ReturnsOnlyMatchingEntities()
+        public void GivenEntitiesWithDifferentOwners_WhenGetProductKeyIsCalledWithOwnerFilter_ThenReturnsOnlyMatchingEntities()
         {
-            List<ProductKeyDataObject> entities = new()
-            {
+            IEnumerable<ProductKeyDataObject> entities =
+            [
                 CreateTestEntity("DARK-SOUL-S613-AAA1", "NucilandiaSteam", "DarkSouls", "Used", owner: "solaire_of_astora"),
                 CreateTestEntity("DARK-SOUL-S873-BBB2", "NucilandiaSteam", "DarkSouls", "Used", owner: "IlarionPintilie")
-            };
+            ];
             repository.GetAll().Returns(entities);
 
             GetProductKeyRequest request = new() { Owner = "solaire_of_astora", Count = 10 };
@@ -226,13 +230,13 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void GetProductKey_WithStatusFilter_ReturnsOnlyMatchingEntities()
+        public void GivenEntitiesWithDifferentStatuses_WhenGetProductKeyIsCalledWithStatusFilter_ThenReturnsOnlyMatchingEntities()
         {
-            List<ProductKeyDataObject> entities = new()
-            {
+            IEnumerable<ProductKeyDataObject> entities =
+            [
                 CreateTestEntity("DARK-SOUL-S613-AAA1", "NucilandiaSteam", "DarkSouls", "Vacant"),
                 CreateTestEntity("DARK-SOUL-S873-BBB2", "NucilandiaSteam", "DarkSouls", "Used")
-            };
+            ];
             repository.GetAll().Returns(entities);
 
             GetProductKeyRequest request = new() { Status = "Vacant", Count = 10 };
@@ -244,14 +248,14 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void GetProductKey_WithStoreNameStartsWithRegexFilter_ReturnsMatchingEntities()
+        public void GivenEntitiesWithDifferentStoreNames_WhenGetProductKeyIsCalledWithStartsWithRegexFilter_ThenReturnsMatchingEntities()
         {
-            List<ProductKeyDataObject> entities = new()
-            {
+            IEnumerable<ProductKeyDataObject> entities =
+            [
                 CreateTestEntity("STEAM-KEY-S613-AAA1", "NucilandiaSteam", "DarkSouls", "Vacant"),
                 CreateTestEntity("GOG-KEY-S613-BBB2", "NucilandiaGog", "DarkSouls", "Vacant"),
                 CreateTestEntity("EPIC-KEY-S613-CCC3", "EpicGames", "DarkSouls", "Vacant")
-            };
+            ];
             repository.GetAll().Returns(entities);
 
             GetProductKeyRequest request = new() { StoreName = "^Nucilandia", Count = 10 };
@@ -262,13 +266,13 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void GetProductKey_WithStoreNameEndsWithRegexFilter_ReturnsMatchingEntities()
+        public void GivenEntitiesWithDifferentStoreNames_WhenGetProductKeyIsCalledWithEndsWithRegexFilter_ThenReturnsMatchingEntities()
         {
-            List<ProductKeyDataObject> entities = new()
-            {
+            IEnumerable<ProductKeyDataObject> entities =
+            [
                 CreateTestEntity("STEAM-KEY-S613-AAA1", "NucilandiaSteam", "DarkSouls", "Vacant"),
                 CreateTestEntity("GOG-KEY-S613-BBB2", "NucilandiaGog", "DarkSouls", "Vacant")
-            };
+            ];
             repository.GetAll().Returns(entities);
 
             GetProductKeyRequest request = new() { StoreName = "Steam$", Count = 10 };
@@ -280,13 +284,13 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void GetProductKey_WithStoreNameFilter_WhenEntityHasNullStoreName_ExcludesThatEntity()
+        public void GivenEntityWithNullStoreName_WhenGetProductKeyIsCalledWithStoreNameFilter_ThenExcludesThatEntity()
         {
-            List<ProductKeyDataObject> entities = new()
-            {
+            IEnumerable<ProductKeyDataObject> entities =
+            [
                 CreateTestEntity("STEAM-KEY-S613-AAA1", "NucilandiaSteam", "DarkSouls", "Vacant"),
                 CreateTestEntity("GOG-KEY-S613-BBB2", null, "DarkSouls", "Vacant")
-            };
+            ];
             repository.GetAll().Returns(entities);
 
             GetProductKeyRequest request = new() { StoreName = "NucilandiaSteam", Count = 10 };
@@ -297,13 +301,13 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void GetProductKey_WithOwnerFilter_WhenEntityHasNullOwner_ExcludesThatEntity()
+        public void GivenEntityWithNullOwner_WhenGetProductKeyIsCalledWithOwnerFilter_ThenExcludesThatEntity()
         {
-            List<ProductKeyDataObject> entities = new()
-            {
+            IEnumerable<ProductKeyDataObject> entities =
+            [
                 CreateTestEntity("DARK-SOUL-S613-AAA1", "NucilandiaSteam", "DarkSouls", "Used", owner: "solaire_of_astora"),
                 CreateTestEntity("DARK-SOUL-S873-BBB2", "NucilandiaSteam", "DarkSouls", "Vacant", owner: null)
-            };
+            ];
             repository.GetAll().Returns(entities);
 
             GetProductKeyRequest request = new() { Owner = "solaire_of_astora", Count = 10 };
@@ -314,12 +318,12 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void GetProductKey_WhenNoEntitiesMatchFilters_ThrowsNullReferenceException()
+        public void GivenNoEntitiesMatchFilters_WhenGetProductKeyIsCalled_ThenThrowsNullReferenceException()
         {
-            List<ProductKeyDataObject> entities = new()
-            {
+            IEnumerable<ProductKeyDataObject> entities =
+            [
                 CreateTestEntity("DARK-SOUL-S613-AAA1", "NucilandiaSteam", "DarkSouls", "Vacant")
-            };
+            ];
             repository.GetAll().Returns(entities);
 
             GetProductKeyRequest request = new() { StoreName = "Astora", Count = 1 };
@@ -327,8 +331,10 @@ namespace ProductKeyManager.UnitTests.Service
             Assert.Throws<NullReferenceException>(() => service.GetProductKey(request));
         }
 
+        // ── AddProductKey ─────────────────────────────────────────────────────────────
+
         [Test]
-        public void AddProductKey_WithValidRequest_CallsRepositoryAdd()
+        public void GivenValidRequest_WhenAddProductKeyIsCalled_ThenCallsRepositoryAdd()
         {
             AddProductKeyRequest request = CreateAddRequest("DARK-SOUL-S613-MNOP", "NucilandiaSteam", "DarkSouls");
 
@@ -338,7 +344,7 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void AddProductKey_WithValidRequest_CallsRepositorySaveChanges()
+        public void GivenValidRequest_WhenAddProductKeyIsCalled_ThenCallsRepositorySaveChanges()
         {
             AddProductKeyRequest request = CreateAddRequest("DARK-SOUL-S613-MNOP", "NucilandiaSteam", "DarkSouls");
 
@@ -348,7 +354,7 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void AddProductKey_WithValidRequest_AddsEntityWithCorrectId()
+        public void GivenValidRequest_WhenAddProductKeyIsCalled_ThenAddsEntityWithCorrectId()
         {
             string key = "DARK-SOUL-S613-MNOP";
             string expectedId = ComputeKeyId(key);
@@ -360,7 +366,7 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void AddProductKey_WithValidRequest_AddsEntityWithCorrectKey()
+        public void GivenValidRequest_WhenAddProductKeyIsCalled_ThenAddsEntityWithCorrectKey()
         {
             AddProductKeyRequest request = CreateAddRequest("DARK-SOUL-S613-MNOP", "NucilandiaSteam", "DarkSouls");
 
@@ -370,7 +376,7 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void AddProductKey_WithValidRequest_AddsEntityWithCorrectStoreName()
+        public void GivenValidRequest_WhenAddProductKeyIsCalled_ThenAddsEntityWithCorrectStoreName()
         {
             AddProductKeyRequest request = CreateAddRequest("DARK-SOUL-S613-MNOP", "NucilandiaSteam", "DarkSouls");
 
@@ -380,7 +386,7 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void AddProductKey_WithValidRequest_AddsEntityWithCorrectProductName()
+        public void GivenValidRequest_WhenAddProductKeyIsCalled_ThenAddsEntityWithCorrectProductName()
         {
             AddProductKeyRequest request = CreateAddRequest("DARK-SOUL-S613-MNOP", "NucilandiaSteam", "DarkSouls");
 
@@ -390,7 +396,7 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void AddProductKey_WithOwnerInRequest_AddsEntityWithCorrectOwner()
+        public void GivenRequestHasOwner_WhenAddProductKeyIsCalled_ThenAddsEntityWithCorrectOwner()
         {
             AddProductKeyRequest request = CreateAddRequest(
                 "DARK-SOUL-S613-MNOP", "NucilandiaSteam", "DarkSouls",
@@ -402,7 +408,7 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void AddProductKey_WithCommentInRequest_AddsEntityWithCorrectComment()
+        public void GivenRequestHasComment_WhenAddProductKeyIsCalled_ThenAddsEntityWithCorrectComment()
         {
             AddProductKeyRequest request = CreateAddRequest(
                 "DARK-SOUL-S613-MNOP", "NucilandiaSteam", "DarkSouls",
@@ -414,7 +420,7 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void AddProductKey_WithStatusInRequest_AddsEntityWithCorrectStatus()
+        public void GivenRequestHasStatus_WhenAddProductKeyIsCalled_ThenAddsEntityWithCorrectStatus()
         {
             AddProductKeyRequest request = CreateAddRequest(
                 "DARK-SOUL-S613-MNOP", "NucilandiaSteam", "DarkSouls",
@@ -426,7 +432,7 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void AddProductKey_WithValidRequest_AddsEntityWithNonEmptyAddedDateTime()
+        public void GivenValidRequest_WhenAddProductKeyIsCalled_ThenAddsEntityWithNonEmptyAddedDateTime()
         {
             AddProductKeyRequest request = CreateAddRequest("DARK-SOUL-S613-MNOP", "NucilandiaSteam", "DarkSouls");
 
@@ -436,7 +442,7 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void AddProductKey_WithValidRequest_AddsEntityWithUpdatedDateTimeEqualToAddedDateTime()
+        public void GivenValidRequest_WhenAddProductKeyIsCalled_ThenUpdatedDateTimeEqualsAddedDateTime()
         {
             AddProductKeyRequest request = CreateAddRequest("DARK-SOUL-S613-MNOP", "NucilandiaSteam", "DarkSouls");
             ProductKeyDataObject capturedEntity = null;
@@ -448,8 +454,10 @@ namespace ProductKeyManager.UnitTests.Service
             Assert.That(capturedEntity.UpdatedDateTime, Is.EqualTo(capturedEntity.AddedDateTime));
         }
 
+        // ── UpdateProductKey ──────────────────────────────────────────────────────────
+
         [Test]
-        public void UpdateProductKey_WithNewStoreName_UpdatesStoreName()
+        public void GivenNewStoreName_WhenUpdateProductKeyIsCalled_ThenUpdatesStoreName()
         {
             ProductKeyDataObject existingEntity = CreateTestEntity("DARK-SOUL-S613-MNOP", "OldStore", "DarkSouls", "Vacant");
             repository.Get(Arg.Any<string>()).Returns(existingEntity);
@@ -466,7 +474,7 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void UpdateProductKey_WithNewProductName_UpdatesProductName()
+        public void GivenNewProductName_WhenUpdateProductKeyIsCalled_ThenUpdatesProductName()
         {
             ProductKeyDataObject existingEntity = CreateTestEntity("DARK-SOUL-S613-MNOP", "NucilandiaSteam", "OldProduct", "Vacant");
             repository.Get(Arg.Any<string>()).Returns(existingEntity);
@@ -483,7 +491,7 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void UpdateProductKey_WithNewOwner_UpdatesOwner()
+        public void GivenNewOwner_WhenUpdateProductKeyIsCalled_ThenUpdatesOwner()
         {
             ProductKeyDataObject existingEntity = CreateTestEntity("DARK-SOUL-S613-MNOP", "NucilandiaSteam", "DarkSouls", "Vacant");
             repository.Get(Arg.Any<string>()).Returns(existingEntity);
@@ -500,7 +508,7 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void UpdateProductKey_WithNewComment_UpdatesComment()
+        public void GivenNewComment_WhenUpdateProductKeyIsCalled_ThenUpdatesComment()
         {
             ProductKeyDataObject existingEntity = CreateTestEntity("DARK-SOUL-S613-MNOP", "NucilandiaSteam", "DarkSouls", "Vacant");
             repository.Get(Arg.Any<string>()).Returns(existingEntity);
@@ -517,7 +525,7 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void UpdateProductKey_WithNewNonUnknownStatus_UpdatesStatus()
+        public void GivenNewNonUnknownStatus_WhenUpdateProductKeyIsCalled_ThenUpdatesStatus()
         {
             ProductKeyDataObject existingEntity = CreateTestEntity("DARK-SOUL-S613-MNOP", "NucilandiaSteam", "DarkSouls", "Vacant");
             repository.Get(Arg.Any<string>()).Returns(existingEntity);
@@ -534,7 +542,7 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void UpdateProductKey_WithEmptyStoreName_PreservesExistingStoreName()
+        public void GivenEmptyStoreName_WhenUpdateProductKeyIsCalled_ThenPreservesExistingStoreName()
         {
             ProductKeyDataObject existingEntity = CreateTestEntity("DARK-SOUL-S613-MNOP", "NucilandiaSteam", "DarkSouls", "Vacant");
             repository.Get(Arg.Any<string>()).Returns(existingEntity);
@@ -551,7 +559,7 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void UpdateProductKey_WithNullProductName_PreservesExistingProductName()
+        public void GivenNullProductName_WhenUpdateProductKeyIsCalled_ThenPreservesExistingProductName()
         {
             ProductKeyDataObject existingEntity = CreateTestEntity("DARK-SOUL-S613-MNOP", "NucilandiaSteam", "DarkSouls", "Vacant");
             repository.Get(Arg.Any<string>()).Returns(existingEntity);
@@ -568,7 +576,7 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void UpdateProductKey_WithNullOwner_PreservesExistingOwner()
+        public void GivenNullOwner_WhenUpdateProductKeyIsCalled_ThenPreservesExistingOwner()
         {
             ProductKeyDataObject existingEntity = CreateTestEntity(
                 "DARK-SOUL-S613-MNOP", "NucilandiaSteam", "DarkSouls", "Vacant",
@@ -587,7 +595,7 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void UpdateProductKey_WithWhiteSpaceComment_PreservesExistingComment()
+        public void GivenWhiteSpaceComment_WhenUpdateProductKeyIsCalled_ThenPreservesExistingComment()
         {
             ProductKeyDataObject existingEntity = CreateTestEntity(
                 "DARK-SOUL-S613-MNOP", "NucilandiaSteam", "DarkSouls", "Vacant",
@@ -606,7 +614,7 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void UpdateProductKey_WithUnknownStatus_PreservesExistingStatus()
+        public void GivenUnknownStatus_WhenUpdateProductKeyIsCalled_ThenPreservesExistingStatus()
         {
             ProductKeyDataObject existingEntity = CreateTestEntity("DARK-SOUL-S613-MNOP", "NucilandiaSteam", "DarkSouls", "Vacant");
             repository.Get(Arg.Any<string>()).Returns(existingEntity);
@@ -623,7 +631,7 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void UpdateProductKey_WithNullStatus_PreservesExistingStatus()
+        public void GivenNullStatus_WhenUpdateProductKeyIsCalled_ThenPreservesExistingStatus()
         {
             ProductKeyDataObject existingEntity = CreateTestEntity("DARK-SOUL-S613-MNOP", "NucilandiaSteam", "DarkSouls", "Vacant");
             repository.Get(Arg.Any<string>()).Returns(existingEntity);
@@ -640,7 +648,7 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void UpdateProductKey_WithValidRequest_CallsRepositoryUpdate()
+        public void GivenValidRequest_WhenUpdateProductKeyIsCalled_ThenCallsRepositoryUpdate()
         {
             ProductKeyDataObject existingEntity = CreateTestEntity("DARK-SOUL-S613-MNOP", "NucilandiaSteam", "DarkSouls", "Vacant");
             repository.Get(Arg.Any<string>()).Returns(existingEntity);
@@ -657,7 +665,7 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void UpdateProductKey_WithValidRequest_CallsRepositorySaveChanges()
+        public void GivenValidRequest_WhenUpdateProductKeyIsCalled_ThenCallsRepositorySaveChanges()
         {
             ProductKeyDataObject existingEntity = CreateTestEntity("DARK-SOUL-S613-MNOP", "NucilandiaSteam", "DarkSouls", "Vacant");
             repository.Get(Arg.Any<string>()).Returns(existingEntity);
@@ -674,7 +682,7 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void UpdateProductKey_WithValidRequest_SetsUpdatedDateTimeToARecentValue()
+        public void GivenValidRequest_WhenUpdateProductKeyIsCalled_ThenSetsUpdatedDateTimeToRecentValue()
         {
             ProductKeyDataObject existingEntity = CreateTestEntity("DARK-SOUL-S613-MNOP", "NucilandiaSteam", "DarkSouls", "Vacant");
             repository.Get(Arg.Any<string>()).Returns(existingEntity);
@@ -693,7 +701,7 @@ namespace ProductKeyManager.UnitTests.Service
         }
 
         [Test]
-        public void UpdateProductKey_WithValidRequest_UsesKeyToLookUpEntityById()
+        public void GivenValidRequest_WhenUpdateProductKeyIsCalled_ThenUsesKeyToLookUpEntityById()
         {
             string key = "DARK-SOUL-S613-MNOP";
             string expectedId = ComputeKeyId(key);
@@ -707,7 +715,7 @@ namespace ProductKeyManager.UnitTests.Service
             repository.Received(1).Get(expectedId);
         }
 
-        static ProductKeyDataObject CreateTestEntity(
+        private static ProductKeyDataObject CreateTestEntity(
             string key,
             string storeName,
             string productName,
@@ -727,7 +735,7 @@ namespace ProductKeyManager.UnitTests.Service
             UpdatedDateTime = TestAddedDateTime
         };
 
-        static AddProductKeyRequest CreateAddRequest(
+        private static AddProductKeyRequest CreateAddRequest(
             string key,
             string storeName,
             string productName,
@@ -743,7 +751,7 @@ namespace ProductKeyManager.UnitTests.Service
             Status = status
         };
 
-        static string ComputeKeyId(string key)
+        private static string ComputeKeyId(string key)
             => new Guid(MD5.HashData(Encoding.Default.GetBytes(key))).ToString();
     }
 }

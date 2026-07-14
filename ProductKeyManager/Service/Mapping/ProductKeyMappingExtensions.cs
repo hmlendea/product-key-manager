@@ -51,10 +51,12 @@ namespace ProductKeyManager.Service.Mapping
             Status = domainModel.Status.Name
         };
 
-        internal static IEnumerable<ProductKey> ToDomainModels(this IEnumerable<ProductKeyDataObject> dataObjects)
+        internal static IEnumerable<ProductKey> ToDomainModels(
+            this IEnumerable<ProductKeyDataObject> dataObjects)
             => dataObjects.Select(dataObject => dataObject.ToDomainModel());
 
-        internal static IEnumerable<ProductKeyObject> ToApiObjects(this IEnumerable<ProductKey> domainModels)
+        internal static IEnumerable<ProductKeyObject> ToApiObjects(
+            this IEnumerable<ProductKey> domainModels)
             => domainModels.Select(domainModel => domainModel.ToApiObject());
     }
 }

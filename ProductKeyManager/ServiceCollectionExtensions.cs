@@ -17,7 +17,9 @@ namespace ProductKeyManager
         private static DataStoreSettings dataStoreSettings;
         private static SecuritySettings securitySettings;
 
-        public static IServiceCollection AddConfigurations(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddConfigurations(
+            this IServiceCollection services,
+            IConfiguration configuration)
         {
             dataStoreSettings = new DataStoreSettings();
             securitySettings = new SecuritySettings();
@@ -31,8 +33,11 @@ namespace ProductKeyManager
                 .AddNuciLoggerSettings(configuration);
         }
 
-        public static IServiceCollection AddCustomServices(this IServiceCollection services) => services
-            .AddSingleton<IFileRepository<ProductKeyDataObject>>(serviceProvider => new XmlRepository<ProductKeyDataObject>(dataStoreSettings.ProductKeysStorePath))
+        public static IServiceCollection AddCustomServices(
+            this IServiceCollection services) => services
+            .AddSingleton<IFileRepository<ProductKeyDataObject>>(
+                serviceProvider => new XmlRepository<ProductKeyDataObject>(
+                    dataStoreSettings.ProductKeysStorePath))
             .AddSingleton<IProductKeyService, ProductKeyService>()
             .AddSingleton<ILogger, NuciLogger>();
     }

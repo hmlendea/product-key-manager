@@ -10,8 +10,10 @@ namespace ProductKeyManager.UnitTests.Api.Models
     [TestFixture]
     public sealed class GetProductKeyResponseTests
     {
+        // ── Constructor ───────────────────────────────────────────────────────────
+
         [Test]
-        public void Constructor_WithSingleProductKeyObject_SetsProductKeysToCollectionWithThatObject()
+        public void GivenSingleProductKeyObject_WhenConstructorIsCalled_ThenSetsProductKeysToCollectionWithThatObject()
         {
             ProductKeyObject productKeyObject = new() { Key = "DARK-SOUL-S613-MNOP", Store = "NucilandiaSteam" };
 
@@ -22,14 +24,14 @@ namespace ProductKeyManager.UnitTests.Api.Models
         }
 
         [Test]
-        public void Constructor_WithCollectionOfProductKeyObjects_SetsProductKeysToThatCollection()
+        public void GivenCollectionOfProductKeyObjects_WhenConstructorIsCalled_ThenSetsProductKeysToThatCollection()
         {
-            List<ProductKeyObject> productKeyObjects = new()
-            {
+            IEnumerable<ProductKeyObject> productKeyObjects =
+            [
                 new() { Key = "DARK-SOUL-S613-AAA1" },
                 new() { Key = "DARK-SOUL-S613-BBB2" },
                 new() { Key = "DARK-SOUL-S613-CCC3" }
-            };
+            ];
 
             GetProductKeyResponse response = new(productKeyObjects);
 
@@ -37,17 +39,17 @@ namespace ProductKeyManager.UnitTests.Api.Models
         }
 
         [Test]
-        public void Constructor_WithEmptyCollection_SetsProductKeysToEmptyCollection()
+        public void GivenEmptyCollection_WhenConstructorIsCalled_ThenSetsProductKeysToEmptyCollection()
         {
-            List<ProductKeyObject> productKeyObjects = new();
-
-            GetProductKeyResponse response = new(productKeyObjects);
+            GetProductKeyResponse response = new([]);
 
             Assert.That(response.ProductKeys.Count(), Is.EqualTo(0));
         }
 
+        // ── Count ────────────────────────────────────────────────────────────────────
+
         [Test]
-        public void Count_WithSingleProductKeyObject_ReturnsOne()
+        public void GivenSingleProductKeyObject_WhenCountIsRead_ThenReturnsOne()
         {
             ProductKeyObject productKeyObject = new() { Key = "DARK-SOUL-S613-MNOP" };
 
@@ -57,14 +59,14 @@ namespace ProductKeyManager.UnitTests.Api.Models
         }
 
         [Test]
-        public void Count_WithThreeProductKeyObjects_ReturnsThree()
+        public void GivenThreeProductKeyObjects_WhenCountIsRead_ThenReturnsThree()
         {
-            List<ProductKeyObject> productKeyObjects = new()
-            {
+            IEnumerable<ProductKeyObject> productKeyObjects =
+            [
                 new() { Key = "DARK-SOUL-S613-AAA1" },
                 new() { Key = "DARK-SOUL-S613-BBB2" },
                 new() { Key = "DARK-SOUL-S613-CCC3" }
-            };
+            ];
 
             GetProductKeyResponse response = new(productKeyObjects);
 
@@ -72,15 +74,15 @@ namespace ProductKeyManager.UnitTests.Api.Models
         }
 
         [Test]
-        public void Count_WithEmptyCollection_ReturnsZero()
+        public void GivenEmptyCollection_WhenCountIsRead_ThenReturnsZero()
         {
-            GetProductKeyResponse response = new(new List<ProductKeyObject>());
+            GetProductKeyResponse response = new([]);
 
             Assert.That(response.Count, Is.EqualTo(0));
         }
 
         [Test]
-        public void Constructor_WithSingleObject_PreservesAllProperties()
+        public void GivenSingleObjectWithAllProperties_WhenConstructorIsCalled_ThenPreservesAllProperties()
         {
             ProductKeyObject productKeyObject = new()
             {
