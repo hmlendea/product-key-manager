@@ -31,6 +31,7 @@ A REST API for securely storing, retrieving, and updating product keys.
 - [Architecture](#architecture)
 - [Contributing](#contributing)
 - [Project Engagement](#project-engagement)
+- [Security](#security)
 - [License](#license)
 
 ## ✨ Capabilities
@@ -206,6 +207,10 @@ When doing so, please:
 Discovered a problem or have a suggestion? [Open an issue](https://github.com/hmlendea/product-key-manager/issues)!
 
 If you find this project useful, consider starring ⭐️ it on GitHub!
+
+## 🔒 Security
+
+For information on reporting security vulnerabilities, see [SECURITY.md](./SECURITY.md).
 
 ## 📄 License
 
