@@ -78,7 +78,7 @@ flowchart LR
     Contract --> Service[ProductKeyService]
     Service --> Models[API Models, Domain Models, and Mappings]
     Service --> RepositoryContract[IFileRepository Contract]
-    RepositoryContract --> XmlRepository[XmlRepository]
+    RepositoryContract --> XmlRepository[ProductKeyXmlRepository]
     XmlRepository --> KeyFile[(XML File)]
     Service --> LoggerContract[ILogger Contract]
     LoggerContract --> Logger[NuciLogger]
@@ -134,7 +134,7 @@ The principal runtime sequence is:
 | API contracts ([ProductKeyManager/Api/Models](ProductKeyManager/Api/Models)) | Define JSON names, HMAC field order, count validation, and retrieval response shape | NuciAPI requests and responses, NuciSecurity.HMAC | Request and response values owned by an operation |
 | `ProductKeyService` ([ProductKeyManager/Service/ProductKeyService.cs](ProductKeyManager/Service/ProductKeyService.cs)) | Filter and select records, generate identifiers and timestamps, merge updates, map representations, sign retrieval responses, and coordinate persistence | API models, domain models, mapping extensions, repository, settings, logger | Explicit singleton |
 | Domain and mapping ([ProductKeyManager/Service/Models](ProductKeyManager/Service/Models), [ProductKeyManager/Service/Mapping](ProductKeyManager/Service/Mapping)) | Represent product keys and statuses and transform API, domain, and persistence representations | API models and persistence data objects | Per-operation values plus static status instances and mapping functions |
-| XML repository | Load and persist `ProductKeyDataObject` collections | NuciDAL `IFileRepository<T>` and `XmlRepository<T>`, configured path | Explicit singleton; implementation owned by NuciDAL |
+| XML repository ([ProductKeyXmlRepository](ProductKeyManager/DataAccess/ProductKeyXmlRepository.cs)) | Load and persist `ProductKeyDataObject` collections, materialising the repository enumeration for NuciDAL XML serialisation | NuciDAL `IFileRepository<T>` and `XmlRepository<T>`, configured path | Explicit singleton; application adapter over NuciDAL |
 | Structured logger ([ProductKeyManager/Logging](ProductKeyManager/Logging)) | Emit operation status and named contextual values | NuciLog `ILogger` and `NuciLogger` | Explicit singleton; destination configured externally |
 
 ## 💾 Data Architecture
@@ -362,11 +362,11 @@ At startup, the service creates the datastore parent directory and an empty XML 
 
 | Contract | Owner | Invariant | Verification | Change Policy |
 |----------|-------|-----------|--------------|---------------|
-| `/ProductKeys` HTTP surface | `ProductKeysController` | Unversioned route with body-bearing `GET`, plus `POST` and `PUT`; JSON property names are explicit | Compilation and manual or future integration tests; no current controller tests | Coordinate any route, verb, body, or response change with all clients |
+| `/ProductKeys` HTTP surface | `ProductKeysController` | Unversioned route with body-bearing `GET`, plus `POST` and `PUT`; JSON property names are explicit | `ProductKeysApiIntegrationTests` | Coordinate any route, verb, body, or response change with all clients |
 | Request HMAC ordering | API request models | Get order is store, product, key, owner, status, count; add and update order is store, product, key, owner, comment, status | Attribute inspection; no current end-to-end signing tests | Preserve ordinal meaning or perform a coordinated client and service migration |
 | Retrieval response signature | `ProductKeyService`, `ProductKeyObject`, and `GetProductKeyResponse` | Product fields use ordinals 1 through 6; computed `count` is excluded through `HmacIgnore` | Response model tests cover values and count, not signature bytes | Treat field order, inclusion, and signing changes as wire-contract changes |
 | Deterministic product-key identifier | `ProductKeyService` | `Guid(MD5(Encoding.Default(key))).ToString()` locates updates | Service unit tests calculate and verify the identifier | Changing hash, encoding, or GUID conversion requires persisted identifier migration |
-| XML representation | Mapping extensions, `ProductKeyDataObject`, and NuciDAL | Empty root name, property names, status strings, and exact timestamp format remain readable | Service tests exercise mapped data objects; no real XML round-trip test | Add migration and compatibility verification before changing persisted shape or format |
+| XML representation | Mapping extensions, `ProductKeyDataObject`, `ProductKeyXmlRepository`, and NuciDAL | Empty root name, property names, status strings, and exact timestamp format remain readable | `ProductKeyXmlPersistenceIntegrationTests` and `ProductKeysApiPersistenceIntegrationTests` | Add migration and compatibility verification before changing persisted shape or format |
 | Product-key statuses | `ProductKeyStatus` | `Unknown`, `Used`, `Vacant`, `Invalid`, `AlreadyOwned`, `RequiresBaseProduct`, and `RegionLocked`; unrecognised text maps to `Unknown` | `ProductKeyStatusTests` | Additions or semantic changes require API, persistence, signature, and client evaluation |
 | Update merge semantics | `ProductKeyService` | Key is the locator; empty text and `Unknown` status preserve persisted values; fields cannot be explicitly cleared | Service unit tests cover preservation and replacement | Maintain semantics or introduce an explicit, coordinated clear/update contract |
 | Retrieval selection semantics | `ProductKeyService` | Regex filters, full scan, random candidate selection, count limit, then product/key ordering | Service unit tests cover filters and result counts, not statistical randomisation | Treat filter anchoring and selection-order changes as externally observable |
@@ -375,7 +375,9 @@ At startup, the service creates the datastore parent directory and an empty XML 
 
 [ProductKeyManager.UnitTests](ProductKeyManager.UnitTests) references the production project and uses NUnit with NSubstitute. `ProductKeyServiceTests` verify retrieval filters and counts, no-result failure, deterministic identifiers, add persistence calls, update lookup and merge semantics, and timestamp assignment through a substituted repository. `ProductKeyStatusTests` verify the seven values, name conversion, equality, and operators. `GetProductKeyResponseTests` verify constructors, property preservation, and computed counts.
 
-No current test constructs the ASP.NET Core host, invokes controller routes, validates request or response HMAC bytes, exercises middleware rejection and exception translation, serialises a real XML file, verifies file corruption handling, simulates concurrent requests, or invokes release infrastructure. Those boundaries require integration or operational verification when revised.
+[ProductKeyManager.IntegrationTests](ProductKeyManager.IntegrationTests) starts the real ASP.NET Core host with an isolated XML store for each test. Its 41 cases cover all three verbs, all supported and unknown statuses, field and regex filters, ordering and count limits, update preservation and replacement, malformed JSON, validation boundaries, authentication, protocol headers, replay conflicts, unknown routes, XML serialisation, and persistence across host restarts.
+
+The integration suite validates response HMAC presence and middleware outcomes, but does not attempt to reproduce package-internal HMAC byte calculations, file-corruption recovery, concurrent writer behaviour, or release infrastructure. Those opaque or operational boundaries require separate verification when revised.
 
 Execute the principal automated verification with:
 ```bash

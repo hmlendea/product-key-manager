@@ -136,6 +136,8 @@ dotnet run --project ProductKeyManager
 dotnet test ProductKeyManager.slnx
 ```
 
+The solution includes [ProductKeyManager.IntegrationTests](ProductKeyManager.IntegrationTests), which starts the API in-process and verifies HTTP contracts, authorisation, replay protection, validation, CRUD behaviour, filtering, and XML persistence across host restarts.
+
 ### Release
 
 The repository includes `release.sh`, which delegates to the upstream deployment script used by the project maintainer.
@@ -174,6 +176,7 @@ The solution contains the following projects:
 |---------|------|---------|
 | `ProductKeyManager/ProductKeyManager.csproj` | ASP.NET Core web application | Product-key management API. |
 | `ProductKeyManager.UnitTests/ProductKeyManager.UnitTests.csproj` | Unit-test project | Tests for API models and product-key services. |
+| `ProductKeyManager.IntegrationTests/ProductKeyManager.IntegrationTests.csproj` | Integration-test project | End-to-end HTTP, security, XML persistence, CRUD, filtering, validation, and replay tests. |
 
 ### Directories
 
@@ -184,6 +187,7 @@ The solution contains the following projects:
 | `ProductKeyManager/DataAccess/` | XML persistence data objects. |
 | `ProductKeyManager/Service/` | Product-key business logic, mappings, and domain models. |
 | `ProductKeyManager.UnitTests/` | Unit tests. |
+| `ProductKeyManager.IntegrationTests/` | In-process ASP.NET Core integration tests with isolated XML stores. |
 
 ## 🏗️ Architecture
 

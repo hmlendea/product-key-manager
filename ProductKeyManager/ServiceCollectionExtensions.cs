@@ -7,6 +7,7 @@ using NuciLog;
 using NuciLog.Core;
 
 using ProductKeyManager.Configuration;
+using ProductKeyManager.DataAccess;
 using ProductKeyManager.DataAccess.DataObjects;
 using ProductKeyManager.Service;
 
@@ -33,7 +34,7 @@ namespace ProductKeyManager
         public static IServiceCollection AddCustomServices(
             this IServiceCollection services) => services
             .AddSingleton<IFileRepository<ProductKeyDataObject>>(
-                serviceProvider => new XmlRepository<ProductKeyDataObject>(
+                serviceProvider => new ProductKeyXmlRepository(
                     serviceProvider.GetRequiredService<DataStoreSettings>().ProductKeysStorePath))
             .AddSingleton<IProductKeyService, ProductKeyService>()
             .AddSingleton<ILogger, NuciLogger>();
