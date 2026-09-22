@@ -136,7 +136,7 @@ dotnet run --project ProductKeyManager
 dotnet test ProductKeyManager.slnx
 ```
 
-The solution includes [ProductKeyManager.IntegrationTests](ProductKeyManager.IntegrationTests), which starts the API in-process and verifies HTTP contracts, authorisation, replay protection, validation, CRUD behaviour, filtering, and XML persistence across host restarts.
+This runs the unit tests and the [ProductKeyManager.IntegrationTests](ProductKeyManager.IntegrationTests), which starts the API in-process and verifies HTTP contracts, authorisation, replay protection, validation, CRUD behaviour, filtering, and XML persistence across host restarts.
 
 ### Release
 
@@ -154,16 +154,16 @@ This script downloads and executes an external release helper from `https://raw.
 
 | Package | Version | Scope | Purpose |
 |---------|---------|-------|---------|
-| `NuciAPI` | `3.5.1` | Runtime | API framework types and infrastructure. |
+| `NuciAPI` | `3.6.1` | Runtime | API framework types and infrastructure. |
 | `NuciAPI.Controllers` | `2.3.1` | Runtime | Controller request processing and authorisation. |
-| `NuciAPI.Middleware` | `2.0.2` | Runtime | Middleware infrastructure. |
-| `NuciAPI.Middleware.ExceptionHandling` | `1.0.1` | Runtime | Global exception handling. |
+| `NuciAPI.Middleware` | `2.0.3` | Runtime | Middleware infrastructure. |
+| `NuciAPI.Middleware.ExceptionHandling` | `1.0.2` | Runtime | Global exception handling. |
 | `NuciAPI.Middleware.Logging` | `1.0.1` | Runtime | Request logging. |
-| `NuciAPI.Middleware.Security` | `1.0.5` | Runtime | Scanner and replay-attack protection. |
-| `NuciDAL` | `3.1.0` | Runtime | XML data persistence. |
-| `NuciExtensions` | `5.3.1` | Runtime | Collection and object utilities. |
+| `NuciAPI.Middleware.Security` | `1.0.6` | Runtime | Scanner and replay-attack protection. |
+| `NuciDAL` | `3.2.1` | Runtime | XML data persistence. |
+| `NuciExtensions` | `5.3.2` | Runtime | Collection and object utilities. |
 | `NuciLog` | `1.2.1` | Runtime | Logger implementation. |
-| `NuciLog.Core` | `3.0.0` | Runtime | Logging interfaces and types. |
+| `NuciLog.Core` | `3.1.0` | Runtime | Logging interfaces and types. |
 | `NuciSecurity.HMAC` | `4.1.3` | Runtime | HMAC request signing and verification. |
 
 ## 🗂️ Project Structure
