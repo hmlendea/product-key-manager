@@ -203,6 +203,10 @@ When doing so, please:
 - Submit focused pull requests that conform to the existing code style
 - Maintain your branch synchronised with `master`
 
+## 📜 Code of Conduct
+
+See the [Code of Conduct](CODE_OF_CONDUCT.md) for the standards of conduct expected in all project spaces.
+
 ## 💝 Project Engagement
 
 Discovered a problem or have a suggestion? [Open an issue](https://github.com/hmlendea/product-key-manager/issues)!
