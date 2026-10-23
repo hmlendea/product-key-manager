@@ -202,9 +202,6 @@ When doing so, please:
 - Preserve the existing public contract unless a breaking change is intentional
 - Submit focused pull requests that conform to the existing code style
 - Maintain your branch synchronised with `master`
-- Revise the documentation when functionality changes
-- Properly test all modifications, including edge cases and error conditions
-- Add tests for additional or modified functionality
 
 ## 💝 Project Engagement
 
