@@ -294,6 +294,8 @@ Tests run automatically on:
 
 See `.github/workflows/dotnet.yml` for the CI pipeline configuration.
 
+Publishing a release also triggers `.github/workflows/github-release.yml`, which builds the release artefacts and uploads them to the published release.
+
 ## Troubleshooting Tests
 
 ### Common Issues

@@ -63,8 +63,6 @@ The principal external boundaries are:
 - **API client:** Submits request bodies to the unversioned `/ProductKeys` route and receives action results. Signed-request processing is owned jointly by the controller and NuciAPI infrastructure.
 - **Host operator:** Supplies the shared secret, datastore location, logger configuration, hosting addresses, TLS arrangement, and writable storage.
 - **Local filesystem:** Retains the XML product-key collection and configured log file. Their durability, permissions, retention, and duplicate copies are external operational responsibilities.
-- **Release infrastructure:** A maintainer may invoke [release.sh](release.sh), which retrieves and executes a remote deployment helper. This supply-chain boundary is not part of the running service.
-
 ## 🏗️ Architectural Style
 
 The repository implements a single-process layered HTTP service with dependency injection and a repository adapter. ASP.NET Core and NuciAPI own hosting and request processing; the controller delegates domain operations through `IProductKeyService`; `ProductKeyService` orchestrates filtering, mapping, identifier generation, mutation, and persistence; NuciDAL supplies the selected XML repository. API models cross into the service contract, so the transport and service boundaries are coupled rather than isolated by separate application commands.
@@ -416,4 +414,3 @@ flowchart TD
 - [PRIVACY.md](PRIVACY.md) - Data handling and privacy practices
 - [ARCHITECTURE.md](ARCHITECTURE.md) - This document
 - [ProductKeyManager.slnx](ProductKeyManager.slnx) - Solution file
-- [release.sh](release.sh) - Release automation script

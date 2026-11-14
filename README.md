@@ -23,8 +23,8 @@ A REST API for securely storing, retrieving, and updating product keys.
 	- [Build](#build)
 	- [Run](#run)
 	- [Test](#test)
-	- [Release](#release)
 	- [Dependencies](#dependencies)
+- [GitHub Actions](#github-actions)
 - [Project Structure](#project-structure)
 	- [Projects and Packages](#projects-and-packages)
 	- [Directories](#directories)
@@ -138,18 +138,6 @@ dotnet test ProductKeyManager.slnx
 
 This runs the unit tests and the [ProductKeyManager.IntegrationTests](ProductKeyManager.IntegrationTests), which starts the API in-process and verifies HTTP contracts, authorisation, replay protection, validation, CRUD behaviour, filtering, and XML persistence across host restarts.
 
-### Release
-
-The repository includes `release.sh`, which delegates to the upstream deployment script used by the project maintainer.
-
-```bash
-bash ./release.sh 5.1.2
-```
-
-This script downloads and executes an external release helper from `https://raw.githubusercontent.com/hmlendea/deployment-scripts/master/release/dotnet/10.0.sh`.
-
-**Note:** Piping into `bash` is an intensely controversial topic. Please review any external scripts before running them in your environment!
-
 ### Dependencies
 
 | Package | Version | Scope | Purpose |
@@ -188,6 +176,13 @@ The solution contains the following projects:
 | `ProductKeyManager/Service/` | Product-key business logic, mappings, and domain models. |
 | `ProductKeyManager.UnitTests/` | Unit tests. |
 | `ProductKeyManager.IntegrationTests/` | In-process ASP.NET Core integration tests with isolated XML stores. |
+
+## ⚙️ GitHub Actions
+
+| Workflow | Purpose | What it does |
+|----------|---------|--------------|
+| [ .NET ](https://github.com/hmlendea/product-key-manager/blob/master/.github/workflows/dotnet.yml) | Continuous integration. | Restores dependencies, builds the solution, and runs the unit and integration tests on pushes and pull requests targeting `master`. |
+| [ GitHub Release ](https://github.com/hmlendea/product-key-manager/blob/master/.github/workflows/github-release.yml) | Release publication. | On a published release, determines the .NET version from the project, builds the release artefacts through the shared release script, and uploads the packaged assets to the GitHub release. |
 
 ## 🏗️ Architecture
 
