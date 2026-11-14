@@ -34,7 +34,6 @@ product-key-manager/
 ├── PRIVACY.md                         # Privacy policy
 ├── SECURITY.md                        # Security policy
 ├── ProductKeyManager.slnx             # Solution file
-└── release.sh                         # Release automation
 ```
 
 ## Setup
@@ -239,20 +238,7 @@ The project follows standard C# conventions:
 
 ## Release Process
 
-The project uses `release.sh` for automated releases:
-
-```bash
-bash ./release.sh <version>
-```
-
-Example:
-```bash
-bash ./release.sh 5.1.2
-```
-
-The script downloads and executes an external release helper from the maintainer's deployment scripts repository.
-
-**Note:** Review the external script before running in your environment.
+Publishing a release on GitHub triggers the `.github/workflows/github-release.yml` workflow, which builds the release artefacts through the shared release helper and uploads them as assets to the published release.
 
 ## Troubleshooting
 

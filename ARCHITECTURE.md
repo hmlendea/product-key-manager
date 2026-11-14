@@ -64,8 +64,6 @@ The principal external boundaries are:
 - **API client:** Submits request bodies to the unversioned `/ProductKeys` route and receives action results. Signed-request processing is owned jointly by the controller and NuciAPI infrastructure.
 - **Host operator:** Supplies the shared secret, datastore location, logger configuration, hosting addresses, TLS arrangement, and writable storage.
 - **Local filesystem:** Retains the XML product-key collection and configured log file. Their durability, permissions, retention, and duplicate copies are external operational responsibilities.
-- **Release infrastructure:** A maintainer may invoke [release.sh](release.sh), which retrieves and executes a remote deployment helper. This supply-chain boundary is not part of the running service.
-
 ## 🏗️ Architectural Style
 
 The repository implements a single-process layered HTTP service with dependency injection and a repository adapter. ASP.NET Core and NuciAPI own hosting and request processing; the controller delegates domain operations through `IProductKeyService`; `ProductKeyService` orchestrates filtering, mapping, identifier generation, mutation, and persistence; NuciDAL supplies the selected XML repository. API models cross into the service contract, so the transport and service boundaries are coupled rather than isolated by separate application commands.
@@ -176,8 +174,6 @@ flowchart LR
 | `PUT /ProductKeys` | Inbound | JSON body with the same fields as add; `key` locates the record and non-empty fields revise it | `ProductKeysController`, `UpdateProductKeyRequest`, and `ProductKeyService` | Missing records, invalid keys, parse failures, and repository failures propagate through NuciAPI; exact action result is package-owned |
 | Product-key XML file | Outbound local persistence | NuciDAL `IFileRepository<ProductKeyDataObject>` using `XmlRepository<ProductKeyDataObject>` | Composition root and NuciDAL | Synchronous errors propagate; no local retry, fallback, transaction, or corruption recovery exists |
 | Structured logging | Outbound local diagnostics | NuciLog `ILogger`, operation names, contextual fields, and request-logging middleware | `ProductKeyService`, NuciAPI middleware, and NuciLogger | Logger failure and request redaction semantics are owned by external packages |
-| Remote release helper | Outbound delivery-time integration | [release.sh](release.sh) retrieves the .NET 10 deployment script from the maintainer's `deployment-scripts` repository and pipes it to Bash | Release wrapper and remote repository | No local integrity verification, vendored duplicate, or fallback is present |
-
 ## 🔀 Key Flows
 
 ### Retrieve Product Keys
@@ -340,8 +336,6 @@ The principal dependency rules are:
 | NuciLog and NuciLog.Core | Logger implementation, abstractions, operation statuses, and structured information keys | Registration, middleware, service, and logging vocabulary | Diagnostic availability and file I/O semantics depend upon package configuration |
 | NuciExtensions | Collection emptiness checks and candidate randomisation | Retrieval service | Selected records depend upon package `Shuffle` semantics |
 | NUnit, NSubstitute, and .NET test SDK | Unit-test execution and collaborator substitution | [ProductKeyManager.UnitTests](ProductKeyManager.UnitTests) | Current verification is isolated from real HTTP, middleware, and filesystem infrastructure |
-| Remote deployment helper | Versioned release procedure downloaded at invocation time | [release.sh](release.sh) | Release execution depends upon network availability and mutable remote content |
-
 ## 🚀 Deployment and Operations
 
 The deployment unit is the output of the ASP.NET Core project targeting .NET 10. One process hosts all middleware, controller, service, repository, and logger instances. [ProductKeyManager/appsettings.json](ProductKeyManager/appsettings.json) is copied to the output directory, but deployment-specific secrets and paths remain operator inputs. Relative datastore and log paths resolve from the process working directory, and durable writable storage is necessary to retain state across replacement or restart.
@@ -356,8 +350,6 @@ At startup, the service creates the datastore parent directory and an empty XML 
 | Scaling | No local cross-process coordination or datastore concurrency contract | Multi-instance writes and elevated mutation concurrency are unsupported until verified or redesigned |
 | Availability | No health checks, readiness checks, replication, failover, or duplicate store | Operators receive only host and logger diagnostics; recovery is external |
 | Continuous integration | [.github/workflows/dotnet.yml](.github/workflows/dotnet.yml) restores, compiles, and tests on Ubuntu for `master` pushes and pull requests | CI verifies source and unit tests but performs no deployment |
-| Release | [release.sh](release.sh) downloads and executes an external .NET 10 release helper | Maintainers must review and rely upon remote release content and network availability |
-
 ## 🛡️ Compatibility Contracts
 
 | Contract | Owner | Invariant | Verification | Change Policy |
@@ -377,7 +369,7 @@ At startup, the service creates the datastore parent directory and an empty XML 
 
 [ProductKeyManager.IntegrationTests](ProductKeyManager.IntegrationTests) starts the real ASP.NET Core host with an isolated XML store for each test. Its 41 cases cover all three verbs, all supported and unknown statuses, field and regex filters, ordering and count limits, update preservation and replacement, malformed JSON, validation boundaries, authentication, protocol headers, replay conflicts, unknown routes, XML serialisation, and persistence across host restarts.
 
-The integration suite validates response HMAC presence and middleware outcomes, but does not attempt to reproduce package-internal HMAC byte calculations, file-corruption recovery, concurrent writer behaviour, or release infrastructure. Those opaque or operational boundaries require separate verification when revised.
+The integration suite validates response HMAC presence and middleware outcomes, but does not attempt to reproduce package-internal HMAC byte calculations, file-corruption recovery, or concurrent writer behaviour. Those opaque or operational boundaries require separate verification when revised.
 
 Execute the principal automated verification with:
 ```bash
@@ -398,7 +390,6 @@ The CI equivalent in [.github/workflows/dotnet.yml](.github/workflows/dotnet.yml
 - **Strict persisted timestamps:** Existing XML must contain the exact custom timestamp form or mapping fails; there is no schema version or migration facility.
 - **Sensitive diagnostics:** Product keys and owner data enter structured logging context, while local redaction, retention, and audit policies are absent.
 - **Opaque package boundaries:** Authorisation details, exception-to-HTTP translation, replay state, repository locking, XML atomicity, and logger failure conduct reside outside this repository.
-- **Remote release execution:** The release wrapper executes downloaded source without a locally pinned digest or vendored duplicate.
 
 ## 🔧 Extension Points
 
@@ -432,7 +423,7 @@ The service expects synchronous calls and immediate persistence after every muta
 | Structured logging vocabulary | [ProductKeyManager/Logging](ProductKeyManager/Logging) |
 | Unit-test project | [ProductKeyManager.UnitTests](ProductKeyManager.UnitTests) |
 | Continuous integration | [.github/workflows/dotnet.yml](.github/workflows/dotnet.yml) |
-| Release wrapper | [release.sh](release.sh) |
+| Release publication | [.github/workflows/github-release.yml](.github/workflows/github-release.yml) |
 
 ## 📚 Related Documentation
 
